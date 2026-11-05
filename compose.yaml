@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:17-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cubo_pe
+      POSTGRES_USER: cubo_pe
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cubo_pe -d cubo_pe"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  web:
+    build: .
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?Defina DATABASE_URL com host db no .env}
+      APP_URL: ${APP_URL:?Defina APP_URL no .env}
+      COMMUNITY_NAME: ${COMMUNITY_NAME:-Comunidade Pernambucana de Cubo Mágico}
+      NODE_ENV: production
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:3000"
+volumes:
+  postgres-data:

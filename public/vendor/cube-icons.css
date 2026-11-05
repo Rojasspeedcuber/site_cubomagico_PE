@@ -1,0 +1,188 @@
+.ci {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  font-size: inherit;
+}
+
+.ci svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ci-1x { width: 1em; height: 1em; }
+.ci-2x { width: 2em; height: 2em; }
+.ci-3x { width: 3em; height: 3em; }
+.ci-4x { width: 4em; height: 4em; }
+.ci-5x { width: 5em; height: 5em; }
+.ci-6x { width: 6em; height: 6em; }
+.ci-7x { width: 7em; height: 7em; }
+.ci-8x { width: 8em; height: 8em; }
+.ci-9x { width: 9em; height: 9em; }
+.ci-10x { width: 10em; height: 10em; }
+.ci-11x { width: 11em; height: 11em; }
+.ci-12x { width: 12em; height: 12em; }
+.ci-13x { width: 13em; height: 13em; }
+.ci-14x { width: 14em; height: 14em; }
+.ci-15x { width: 15em; height: 15em; }
+.ci-16x { width: 16em; height: 16em; }
+.ci-17x { width: 17em; height: 17em; }
+.ci-18x { width: 18em; height: 18em; }
+.ci-19x { width: 19em; height: 19em; }
+.ci-20x { width: 20em; height: 20em; }
+.ci-30x { width: 30em; height: 30em; }
+.ci-40x { width: 40em; height: 40em; }
+.ci-50x { width: 50em; height: 50em; }
+
+/* Step-by-Step Viewer */
+.ci-steps {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 0.5rem 0;
+}
+
+/* ci-Nx no container só define escala dos filhos, não o tamanho do container */
+.ci-steps.ci-1x, .ci-steps.ci-2x, .ci-steps.ci-3x, .ci-steps.ci-4x,
+.ci-steps.ci-5x, .ci-steps.ci-6x, .ci-steps.ci-7x, .ci-steps.ci-8x,
+.ci-steps.ci-9x, .ci-steps.ci-10x, .ci-steps.ci-11x, .ci-steps.ci-12x,
+.ci-steps.ci-13x, .ci-steps.ci-14x, .ci-steps.ci-15x, .ci-steps.ci-16x,
+.ci-steps.ci-17x, .ci-steps.ci-18x, .ci-steps.ci-19x, .ci-steps.ci-20x {
+  width: 100%;
+  height: auto;
+}
+
+.ci-steps-inner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+}
+
+.ci-steps-inner-vertical {
+  flex-direction: column;
+  align-items: center;
+}
+
+.ci-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.ci-step-icon {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.ci-step-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ci-step-label {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: #aaa;
+  text-align: center;
+  min-width: 2em;
+}
+
+.ci-step-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.ci-step-arrow-vertical {
+  transform: none;
+}
+
+/* Sequence Player */
+.ci-player {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+}
+
+.ci-player-controls {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  max-width: 100%;
+}
+
+.ci-player-btn {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  color: #ccc;
+  border-radius: 4px;
+  padding: 0.25rem 0.4rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  line-height: 1;
+  min-width: 1.75em;
+  height: 1.75em;
+  flex-shrink: 0;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ci-player-btn:hover {
+  background: #383838;
+  border-color: #666;
+  color: #fff;
+}
+
+.ci-player-play {
+  min-width: 2em;
+}
+
+.ci-player-progress {
+  width: 100%;
+  max-width: 8em;
+  height: 3px;
+  background: #333;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ci-player-progress-bar {
+  height: 100%;
+  width: 0;
+  background: #ffd500;
+  border-radius: 2px;
+  transition: width 0.15s ease;
+}
+
+.ci-player-label {
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  color: #888;
+  text-align: center;
+}
+
+/* Interactive 3D rotation */
+.ci-interactive,
+[data-ci-interactive="1"] {
+  touch-action: none;
+  user-select: none;
+}
