@@ -1,4 +1,6 @@
 import * as events from './events.ts';
+import * as management from './management.ts';
+import { z } from 'zod';
 import { query, transaction, audit } from './db.ts';
 import { sessionUser, publicUser, hashPassword, verifyPassword, createSession, readToken, tokenHash, sessionCookie, rateLimit } from './auth.ts';
 import { HttpError, authenticated, admin, requireOrigin } from './policy.ts';
@@ -10,15 +12,19 @@ export async function handleApi(request:Request): Promise<Response> {
   const method=request.method;
   if (!['GET','HEAD','OPTIONS'].includes(method)) requireOrigin(request);
   const user = await sessionUser(request);
+  if(user && !['GET','HEAD','OPTIONS'].includes(method) && path.join('/')!=='auth/logout') await rateLimit(`writes:${user.id}`,300);
   if(method==='GET' && path.join('/')==='session') return json(user);
-  if(method==='POST' && path[0]==='auth') {
+  if(method==='GET' && path.join('/')==='content') return json(await management.getContent());
+  if(method==='GET' && path.join('/')==='algorithms') return json(await management.listAlgorithms(user?.role==='ADMIN'));
+  if(method==='POST' && path[0]==='auth' && path.length===2) {
    if(path[1]==='logout') {
     const token=readToken(request);
     if(token) await query('DELETE FROM sessions WHERE token_hash=$1',[tokenHash(token)]);
     return json(null,200,{'Set-Cookie':sessionCookie('',true)});
    }
    if(path[1]==='register' || path[1]==='login') {
-    await rateLimit(`auth:ip:${request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'local'}`,100);
+    await rateLimit('auth:global',1000);
+    await rateLimit(`auth:ip:${request.headers.get('x-forwarded-for')?.split(',').at(-1)?.trim() || 'local'}`,100);
     const payload=await body(request);
     if(path[1]==='register') {
      const data=parse(registerSchema,payload);
@@ -60,6 +66,16 @@ export async function handleApi(request:Request): Promise<Response> {
    const actor=authenticated(user);
    if(['users','audit','algorithms','content'].includes(path[1])) admin(actor);
    else if(actor.role==='COMPETITOR') throw new HttpError(403,'Acesso restrito a organizadores.');
+   if(method==='GET' && path.join('/')==='admin/audit') return json(await management.listAudit());
+   if(method==='GET' && path.join('/')==='admin/users') return json(await management.listUsers());
+   if(method==='PATCH' && path[1]==='users' && path.length===3) {
+    const data=parse(z.object({role:z.enum(['ADMIN','ORGANIZER','COMPETITOR'])}),await body(request));
+    return json(await management.setRole(path[2],data.role,actor.id));
+   }
+   if(method==='PATCH' && path.join('/')==='admin/content') return json(await management.updateContent(actor,await body(request)));
+   if(method==='POST' && path.join('/')==='admin/algorithms') return json(await management.createAlgorithm(actor,await body(request)),201);
+   if(method==='PATCH' && path[1]==='algorithms' && path.length===3) return json(await management.updateAlgorithm(path[2],actor,await body(request)));
+   if(method==='DELETE' && path[1]==='algorithms' && path.length===3) return json(await management.archiveAlgorithm(path[2],actor));
    if(path[1]==='events') {
     if(method==='GET' && path.length===2) return json(await events.listEvents(actor,true));
     if(method==='POST' && path.length===2) return json(await events.createEvent(actor,await body(request)),201);
@@ -75,6 +91,7 @@ export async function handleApi(request:Request): Promise<Response> {
   }
   throw new HttpError(404,'Recurso não encontrado.');
  } catch(error:any) {
+  if(error instanceof URIError) return Response.json({error:'Caminho inválido.'},{status:400});
   if(error instanceof HttpError) return Response.json({error:error.message},{status:error.status,headers:{'Cache-Control':'no-store'}});
   if(error?.code==='23505') return Response.json({error:'Registro já existente.'},{status:409});
   if(['22P02','22007','23514','23503'].includes(error?.code)) return Response.json({error:'Dados inválidos ou referência inexistente.'},{status:400});

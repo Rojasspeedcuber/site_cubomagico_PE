@@ -1,30 +1,535 @@
-'use client';
-import Link from 'next/link';
-import {useEffect,useState,type FormEvent} from 'react';
-import {ArrowLeft,ArrowUpRight,CalendarDays,CheckCircle2,Clock3,Film,Flag,Users} from 'lucide-react';
-import {api,useApi} from './api';
-import {useSite} from './AppShell';
-import {dateLabel,formatTime,parseTime,safeUrl} from './frontend-utils';
-import {puzzleName} from './EventsView';
-import {Empty,ErrorBox,Loading,Notice,PageHeading,Status} from './ui';
-import type {Attempt,CubeEvent,Round,Submission} from './types';
-export default function EventDetail({id}:{id:string}){
- const event=useApi<CubeEvent>(`/events/${id}`),{user,sessionLoading}=useSite();const [selected,setSelected]=useState<string[]>([]),[roundId,setRoundId]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[success,setSuccess]=useState('');
- async function register(e:FormEvent){e.preventDefault();setError('');setSuccess('');setBusy(true);try{await api(`/events/${id}/register`,'POST',{roundIds:selected});event.reload();setSuccess('Inscrição salva. Confira abaixo as rodadas e seus prazos.');}catch(e){setError((e as Error).message);}finally{setBusy(false);}}
- const enrolled=!!user&&event.data?.participants?.some(p=>p.id===user.id);
- return <div className="container page-section"><Link href="/campeonatos" className="back-link"><ArrowLeft size={15}/> Todos os campeonatos</Link>{event.loading?<Loading label="Carregando campeonato…"/>:event.error?<ErrorBox message={event.error} retry={event.reload}/>:event.data&&<><PageHeading eyebrow="Campeonato online" title={event.data.name} description={event.data.description}><Status status={event.data.status}/></PageHeading><div className="event-detail-layout"><div><section className="panel"><h2>Antes de se inscrever</h2><p className="prose">{event.data.rules||'A organização ainda não informou regras complementares.'}</p><div className="info-grid"><div><CalendarDays size={18}/><span>Inscrições abrem<strong>{dateLabel(event.data.registrationOpen)}</strong></span></div><div><Clock3 size={18}/><span>Inscrições encerram<strong>{dateLabel(event.data.registrationClose)}</strong></span></div><div><Users size={18}/><span>Participantes<strong>{event.data.participantCount}</strong></span></div><div><Flag size={18}/><span>Organização<strong>{event.data.organizerName||'Equipe organizadora'}</strong></span></div></div><p className="caption">Horários de Pernambuco (UTC−3). Esta competição não é um evento oficial da WCA.</p></section><section className="panel"><h2>Rodadas e resultados</h2>{!event.data.rounds.length?<Empty title="Nenhuma rodada publicada"/>:<><div className="round-tabs" aria-label="Selecionar rodada">{event.data.rounds.map(r=><button key={r.id} className={`chip ${(roundId||event.data?.rounds[0]?.id)===r.id?'selected':''}`} aria-pressed={(roundId||event.data?.rounds[0]?.id)===r.id} onClick={()=>setRoundId(r.id)}>{r.name}<small>{puzzleName[r.puzzle]} · {r.format==='AO5'?'Ao5':'Mo3'}</small></button>)}</div><RoundView eventId={id} roundId={roundId||event.data.rounds[0].id} key={`${roundId||event.data.rounds[0].id}-${user?.id||'visitor'}-${enrolled}`}/></>}</section>{!!event.data.participants?.length&&<section className="panel"><h2>Quem participa</h2><ul className="participant-list">{event.data.participants.map(p=><li key={p.id}><span className="avatar">{p.displayName.slice(0,1).toUpperCase()}</span><span><strong>{p.displayName}</strong><small>{[p.city,p.wcaId].filter(Boolean).join(' · ')||'Participante'}</small></span></li>)}</ul></section>}</div><aside><section className="panel registration-panel"><span className="panel-kicker">Sua participação</span><h2>{enrolled?'Você está inscrito':'Vamos participar?'}</h2>{sessionLoading?<Loading label="Verificando sua conta…"/>:!user?<><p>Entre na sua conta para escolher as rodadas e enviar seus tempos.</p><Link href={`/conta?next=${encodeURIComponent(`/campeonatos/${id}`)}`} className="button primary">Entrar ou criar conta</Link></>:<form onSubmit={register}><p>{enrolled?'Para atualizar sua inscrição, selecione novamente todas as rodadas desejadas.':'Selecione as rodadas em que quer competir.'}</p><fieldset><legend className="sr-only">Rodadas da inscrição</legend>{event.data.rounds.map(r=><label className="checkbox-row" key={r.id}><input type="checkbox" checked={selected.includes(r.id)} onChange={e=>setSelected(e.target.checked?[...selected,r.id]:selected.filter(x=>x!==r.id))}/><span><strong>{r.name}</strong><small>{puzzleName[r.puzzle]} · {r.format==='AO5'?'Ao5':'Mo3'}</small></span></label>)}</fieldset><button className="button primary full" disabled={busy||selected.length===0}>{busy?'Salvando…':enrolled?'Atualizar inscrição':'Confirmar inscrição'}</button></form>}{error&&<Notice kind="error">{error}</Notice>}{success&&<Notice kind="success">{success}</Notice>}</section><div className="notice"><Film size={22}/><p>Vídeos podem ser obrigatórios ou solicitados pela organização. Use um link acessível à equipe e confira o prazo de correção.</p></div></aside></div></>}</div>
+"use client";
+import Link from "next/link";
+import { useEffect, useState, type FormEvent } from "react";
+import {
+  ArrowLeft,
+  ArrowUpRight,
+  CalendarDays,
+  CheckCircle2,
+  Clock3,
+  Film,
+  Flag,
+  Users,
+} from "lucide-react";
+import { api, useApi } from "./api";
+import { useSite } from "./AppShell";
+import { dateLabel, formatTime, parseTime, safeUrl } from "./frontend-utils";
+import { puzzleName } from "./EventsView";
+import { Empty, ErrorBox, Loading, Notice, PageHeading, Status } from "./ui";
+import type { Attempt, CubeEvent, Round, Submission } from "./types";
+export default function EventDetail({ id }: { id: string }) {
+  const event = useApi<CubeEvent>(`/events/${id}`),
+    { user, sessionLoading } = useSite();
+  const [selected, setSelected] = useState<string[]>([]),
+    [roundId, setRoundId] = useState(""),
+    [busy, setBusy] = useState(false),
+    [error, setError] = useState(""),
+    [success, setSuccess] = useState("");
+  async function register(e: FormEvent) {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setBusy(true);
+    try {
+      await api(`/events/${id}/register`, "POST", { roundIds: selected });
+      event.reload();
+      setSuccess("Inscrição salva. Confira abaixo as rodadas e seus prazos.");
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  const enrolled =
+    !!user && event.data?.participants?.some((p) => p.id === user.id);
+  return (
+    <div className="container page-section">
+      <Link href="/campeonatos" className="back-link">
+        <ArrowLeft size={15} /> Todos os campeonatos
+      </Link>
+      {event.loading ? (
+        <Loading label="Carregando campeonato…" />
+      ) : event.error ? (
+        <ErrorBox message={event.error} retry={event.reload} />
+      ) : (
+        event.data && (
+          <>
+            <PageHeading
+              eyebrow="Campeonato online"
+              title={event.data.name}
+              description={event.data.description}
+            >
+              <Status status={event.data.status} />
+            </PageHeading>
+            <div className="event-detail-layout">
+              <div>
+                <section className="panel">
+                  <h2>Antes de se inscrever</h2>
+                  <p className="prose">
+                    {event.data.rules ||
+                      "A organização ainda não informou regras complementares."}
+                  </p>
+                  <div className="info-grid">
+                    <div>
+                      <CalendarDays size={18} />
+                      <span>
+                        Inscrições abrem
+                        <strong>
+                          {dateLabel(event.data.registrationOpen)}
+                        </strong>
+                      </span>
+                    </div>
+                    <div>
+                      <Clock3 size={18} />
+                      <span>
+                        Inscrições encerram
+                        <strong>
+                          {dateLabel(event.data.registrationClose)}
+                        </strong>
+                      </span>
+                    </div>
+                    <div>
+                      <Users size={18} />
+                      <span>
+                        Participantes
+                        <strong>{event.data.participantCount}</strong>
+                      </span>
+                    </div>
+                    <div>
+                      <Flag size={18} />
+                      <span>
+                        Organização
+                        <strong>
+                          {event.data.organizerName || "Equipe organizadora"}
+                        </strong>
+                      </span>
+                    </div>
+                  </div>
+                  <p className="caption">
+                    Horários de Pernambuco (UTC−3). Esta competição não é um
+                    evento oficial da WCA.
+                  </p>
+                </section>
+                <section className="panel">
+                  <h2>Rodadas e resultados</h2>
+                  {!event.data.rounds.length ? (
+                    <Empty title="Nenhuma rodada publicada" />
+                  ) : (
+                    <>
+                      <div
+                        className="round-tabs"
+                        aria-label="Selecionar rodada"
+                      >
+                        {event.data.rounds.map((r) => (
+                          <button
+                            key={r.id}
+                            className={`chip ${(roundId || event.data?.rounds[0]?.id) === r.id ? "selected" : ""}`}
+                            aria-pressed={
+                              (roundId || event.data?.rounds[0]?.id) === r.id
+                            }
+                            onClick={() => setRoundId(r.id)}
+                          >
+                            {r.name}
+                            <small>
+                              {puzzleName[r.puzzle]} ·{" "}
+                              {r.format === "AO5" ? "Ao5" : "Mo3"}
+                            </small>
+                          </button>
+                        ))}
+                      </div>
+                      <RoundView
+                        eventId={id}
+                        roundId={roundId || event.data.rounds[0].id}
+                        key={`${roundId || event.data.rounds[0].id}-${user?.id || "visitor"}-${enrolled}`}
+                      />
+                    </>
+                  )}
+                </section>
+                {!!event.data.participants?.length && (
+                  <section className="panel">
+                    <h2>Quem participa</h2>
+                    <ul className="participant-list">
+                      {event.data.participants.map((p) => (
+                        <li key={p.id}>
+                          <span className="avatar">
+                            {p.displayName.slice(0, 1).toUpperCase()}
+                          </span>
+                          <span>
+                            <strong>{p.displayName}</strong>
+                            <small>
+                              {[p.city, p.wcaId].filter(Boolean).join(" · ") ||
+                                "Participante"}
+                            </small>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+              </div>
+              <aside>
+                <section className="panel registration-panel">
+                  <span className="panel-kicker">Sua participação</span>
+                  <h2>
+                    {enrolled ? "Você está inscrito" : "Vamos participar?"}
+                  </h2>
+                  {sessionLoading ? (
+                    <Loading label="Verificando sua conta…" />
+                  ) : !user ? (
+                    <>
+                      <p>
+                        Entre na sua conta para escolher as rodadas e enviar
+                        seus tempos.
+                      </p>
+                      <Link
+                        href={`/conta?next=${encodeURIComponent(`/campeonatos/${id}`)}`}
+                        className="button primary"
+                      >
+                        Entrar ou criar conta
+                      </Link>
+                    </>
+                  ) : (
+                    <form onSubmit={register}>
+                      <p>
+                        {enrolled
+                          ? "Selecione as rodadas que deseja adicionar. As inscrições anteriores continuam válidas."
+                          : "Selecione as rodadas em que quer competir."}
+                      </p>
+                      <fieldset>
+                        <legend className="sr-only">
+                          Rodadas da inscrição
+                        </legend>
+                        {event.data.rounds.map((r) => (
+                          <label className="checkbox-row" key={r.id}>
+                            <input
+                              type="checkbox"
+                              checked={selected.includes(r.id)}
+                              onChange={(e) =>
+                                setSelected(
+                                  e.target.checked
+                                    ? [...selected, r.id]
+                                    : selected.filter((x) => x !== r.id),
+                                )
+                              }
+                            />
+                            <span>
+                              <strong>{r.name}</strong>
+                              <small>
+                                {puzzleName[r.puzzle]} ·{" "}
+                                {r.format === "AO5" ? "Ao5" : "Mo3"}
+                              </small>
+                            </span>
+                          </label>
+                        ))}
+                      </fieldset>
+                      <button
+                        className="button primary full"
+                        disabled={busy || selected.length === 0}
+                      >
+                        {busy
+                          ? "Salvando…"
+                          : enrolled
+                            ? "Adicionar à inscrição"
+                            : "Confirmar inscrição"}
+                      </button>
+                    </form>
+                  )}
+                  {error && <Notice kind="error">{error}</Notice>}
+                  {success && <Notice kind="success">{success}</Notice>}
+                </section>
+                <div className="notice">
+                  <Film size={22} />
+                  <p>
+                    Vídeos podem ser obrigatórios ou solicitados pela
+                    organização. Use um link acessível à equipe e confira o
+                    prazo de correção.
+                  </p>
+                </div>
+              </aside>
+            </div>
+          </>
+        )
+      )}
+    </div>
+  );
 }
-function RoundView({eventId,roundId}:{eventId:string;roundId:string}){
- const round=useApi<Round>(`/events/${eventId}/rounds/${roundId}`),{user}=useSite();
- if(round.loading)return <Loading label="Carregando rodada…"/>;if(round.error)return <ErrorBox message={round.error} retry={round.reload}/>;if(!round.data)return null;
- const r=round.data;const request=r.videoRequest||r.mySubmission?.videoRequest;const requestMessage=typeof request==='string'?request:request?.message;
- return <><div className="round-info"><span>{r.format==='AO5'?'Ao5 · média de 5, excluindo melhor e pior':'Mo3 · média de 3 tentativas'}</span><span>De {dateLabel(r.opensAt)} até {dateLabel(r.closesAt)}</span></div>{requestMessage&&<Notice kind="warning"><Film size={20}/><div><strong>A organização solicitou um vídeo</strong><p>{requestMessage}</p></div></Notice>}{r.scrambles?.length?<><h3>Embaralhamentos</h3><ol className="scramble-list">{r.scrambles.map((s,i)=><li key={i}><span>{i+1}</span><code>{s}</code></li>)}</ol>{user&&<SubmissionForm round={r} eventId={eventId} onSaved={round.reload}/>}</>:<Notice>Os embaralhamentos ficam disponíveis somente para inscritos, após a abertura da rodada. {user?'Se já se inscreveu, aguarde o horário informado.':'Entre e inscreva-se para participar.'}</Notice>}
- <h3 className="subsection-title">Classificação {r.published?'publicada':'da rodada'}</h3>{!r.published&&<p className="muted">Os resultados só se tornam públicos após a revisão e publicação pela organização.</p>}{r.results?.length?<div className="table-scroll"><table><caption className="sr-only">Classificação de {r.name}</caption><thead><tr><th scope="col">Pos.</th><th scope="col">Participante</th><th scope="col">Média</th><th scope="col">Melhor</th><th scope="col">Situação</th></tr></thead><tbody>{r.results.map(result=><tr key={result.id}><td>{result.rank??'—'}</td><th scope="row">{result.displayName}</th><td className="mono">{formatTime(result.averageCs)}</td><td className="mono">{formatTime(result.bestCs)}</td><td><Status status={result.status}/></td></tr>)}</tbody></table></div>:<Empty title="Nenhum resultado publicado"/>}</>
+function RoundView({ eventId, roundId }: { eventId: string; roundId: string }) {
+  const round = useApi<Round>(`/events/${eventId}/rounds/${roundId}`),
+    { user } = useSite();
+  if (round.loading) return <Loading label="Carregando rodada…" />;
+  if (round.error)
+    return <ErrorBox message={round.error} retry={round.reload} />;
+  if (!round.data) return null;
+  const r = round.data;
+  const request = r.videoRequest || r.mySubmission?.videoRequest;
+  const requestMessage =
+    typeof request === "string" ? request : request?.message;
+  return (
+    <>
+      <div className="round-info">
+        <span>
+          {r.format === "AO5"
+            ? "Ao5 · média de 5, excluindo melhor e pior"
+            : "Mo3 · média de 3 tentativas"}
+        </span>
+        <span>
+          De {dateLabel(r.opensAt)} até {dateLabel(r.closesAt)}
+        </span>
+      </div>
+      {requestMessage && (
+        <Notice kind="warning">
+          <Film size={20} />
+          <div>
+            <strong>A organização solicitou um vídeo</strong>
+            <p>{requestMessage}</p>
+          </div>
+        </Notice>
+      )}
+      {r.scrambles?.length ? (
+        <>
+          <h3>Embaralhamentos</h3>
+          <ol className="scramble-list">
+            {r.scrambles.map((s, i) => (
+              <li key={i}>
+                <span>{i + 1}</span>
+                <code>{s}</code>
+              </li>
+            ))}
+          </ol>
+          {user && (
+            <SubmissionForm
+              round={r}
+              eventId={eventId}
+              onSaved={round.reload}
+            />
+          )}
+        </>
+      ) : (
+        <Notice>
+          Os embaralhamentos ficam disponíveis somente para inscritos, após a
+          abertura da rodada.{" "}
+          {user
+            ? "Se já se inscreveu, aguarde o horário informado."
+            : "Entre e inscreva-se para participar."}
+        </Notice>
+      )}
+      <h3 className="subsection-title">
+        Classificação {r.published ? "publicada" : "da rodada"}
+      </h3>
+      {!r.published && (
+        <p className="muted">
+          Os resultados só se tornam públicos após a revisão e publicação pela
+          organização.
+        </p>
+      )}
+      {r.results?.length ? (
+        <div className="table-scroll">
+          <table>
+            <caption className="sr-only">Classificação de {r.name}</caption>
+            <thead>
+              <tr>
+                <th scope="col">Pos.</th>
+                <th scope="col">Participante</th>
+                <th scope="col">Média</th>
+                <th scope="col">Melhor</th>
+                <th scope="col">Situação</th>
+              </tr>
+            </thead>
+            <tbody>
+              {r.results.map((result) => (
+                <tr key={result.id}>
+                  <td>{result.rank ?? "—"}</td>
+                  <th scope="row">{result.displayName}</th>
+                  <td className="mono">{formatTime(result.averageCs)}</td>
+                  <td className="mono">{formatTime(result.bestCs)}</td>
+                  <td>
+                    <Status status={result.status} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <Empty title="Nenhum resultado publicado" />
+      )}
+    </>
+  );
 }
-function SubmissionForm({round,eventId,onSaved}:{round:Round;eventId:string;onSaved:()=>void}){
- const count=round.format==='AO5'?5:3;const previous=round.mySubmission;const [times,setTimes]=useState(()=>Array.from({length:count},(_,i)=>previous?.attempts[i]?.timeCs!=null?formatTime(previous.attempts[i].timeCs):''));const [penalties,setPenalties]=useState<Attempt['penalty'][]>(()=>Array.from({length:count},(_,i)=>previous?.attempts[i]?.penalty||'NONE'));const [video,setVideo]=useState(previous?.videoUrl||''),[error,setError]=useState(''),[saved,setSaved]=useState(false),[busy,setBusy]=useState(false),[now,setNow]=useState<number|null>(null);
- useEffect(()=>{setNow(Date.now());const timer=setInterval(()=>setNow(Date.now()),10000);return()=>clearInterval(timer);},[]);
- const expired=now!==null&&now>new Date(round.closesAt).getTime();
- async function submit(e:FormEvent){e.preventDefault();setError('');setSaved(false);const attempts=times.map((v,i)=>({timeCs:penalties[i]==='DNF'?null:parseTime(v),penalty:penalties[i]}));if(attempts.some(a=>a.penalty!=='DNF'&&a.timeCs===null)){setError('Preencha cada tempo com segundos e até dois centésimos, como 12,34 ou 1:02,03. Para tentativa sem tempo, selecione DNF.');return;}if(video&&!safeUrl(video)){setError('Informe um link de vídeo começando com https:// ou http://.');return;}setBusy(true);try{await api(`/events/${eventId}/rounds/${round.id}/submissions`,'POST',{attempts,videoUrl:video.trim()||undefined});setSaved(true);onSaved();}catch(e){setError((e as Error).message);}finally{setBusy(false);}}
- return <div className="submission-box"><div className="section-heading compact"><h3>{previous?'Seu envio':'Enviar suas tentativas'}</h3>{previous&&<Status status={previous.status}/>}</div>{previous?.reviewNote&&<Notice kind={previous.status==='REJECTED'?'warning':'info'}><strong>Nota da organização:</strong> {previous.reviewNote}</Notice>}<p className="muted">Digite o tempo sem somar a penalidade. A opção +2 acrescenta dois segundos automaticamente. DNF significa tentativa não concluída.</p><form onSubmit={submit}><fieldset disabled={expired||busy}><legend className="sr-only">Tempos e penalidades</legend><div className="attempts-grid">{times.map((time,i)=><div className="attempt-field" key={i}><label htmlFor={`time-${round.id}-${i}`}>Tentativa {i+1}</label><input id={`time-${round.id}-${i}`} inputMode="decimal" placeholder="12,34" value={time} disabled={penalties[i]==='DNF'} onChange={e=>setTimes(values=>values.map((v,k)=>k===i?e.target.value:v))}/><label className="sr-only" htmlFor={`penalty-${round.id}-${i}`}>Penalidade da tentativa {i+1}</label><select id={`penalty-${round.id}-${i}`} value={penalties[i]} onChange={e=>setPenalties(values=>values.map((v,k)=>k===i?e.target.value as Attempt['penalty']:v))}><option value="NONE">Sem penalidade</option><option value="PLUS2">+2 segundos</option><option value="DNF">DNF</option></select></div>)}</div><label className="field"><span>Link do vídeo {round.videoRequired?'(obrigatório)':'(se solicitado ou opcional)'}</span><input type="url" required={round.videoRequired} value={video} onChange={e=>setVideo(e.target.value)} placeholder="https://…"/><small>Use um vídeo que a organização consiga abrir. Não envie senhas ou arquivos privados.</small></label><button className="button primary" type="submit">{busy?'Enviando…':previous?'Corrigir e reenviar':'Enviar para revisão'}</button></fieldset></form><p className="caption">{expired?'O prazo foi encerrado. Não é mais possível substituir este envio.':`Você pode corrigir este envio até ${dateLabel(round.closesAt)}. Cada reenvio volta para análise.`}</p>{previous?.videoUrl&&safeUrl(previous.videoUrl)&&<a className="text-button" href={safeUrl(previous.videoUrl)} target="_blank" rel="noopener noreferrer">Abrir vídeo enviado <ArrowUpRight size={15}/></a>}{error&&<Notice kind="error">{error}</Notice>}{saved&&<Notice kind="success"><CheckCircle2 size={17}/> Envio salvo e aguardando revisão.</Notice>}</div>
+function SubmissionForm({
+  round,
+  eventId,
+  onSaved,
+}: {
+  round: Round;
+  eventId: string;
+  onSaved: () => void;
+}) {
+  const count = round.format === "AO5" ? 5 : 3;
+  const previous = round.mySubmission;
+  const [times, setTimes] = useState(() =>
+    Array.from({ length: count }, (_, i) =>
+      previous?.attempts[i]?.timeCs != null
+        ? formatTime(previous.attempts[i].timeCs)
+        : "",
+    ),
+  );
+  const [penalties, setPenalties] = useState<Attempt["penalty"][]>(() =>
+    Array.from(
+      { length: count },
+      (_, i) => previous?.attempts[i]?.penalty || "NONE",
+    ),
+  );
+  const [video, setVideo] = useState(previous?.videoUrl || ""),
+    [error, setError] = useState(""),
+    [saved, setSaved] = useState(false),
+    [busy, setBusy] = useState(false),
+    [now, setNow] = useState<number | null>(null);
+  useEffect(() => {
+    setNow(Date.now());
+    const timer = setInterval(() => setNow(Date.now()), 10000);
+    return () => clearInterval(timer);
+  }, []);
+  const expired =
+    round.published ||
+    (now !== null && now >= new Date(round.closesAt).getTime());
+  const videoRequired =
+    round.videoRequired || !!round.videoRequest || !!previous?.videoRequest;
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    setError("");
+    setSaved(false);
+    const attempts = times.map((v, i) => ({
+      timeCs: penalties[i] === "DNF" ? null : parseTime(v),
+      penalty: penalties[i],
+    }));
+    if (attempts.some((a) => a.penalty !== "DNF" && a.timeCs === null)) {
+      setError(
+        "Preencha cada tempo com segundos e até dois centésimos, como 12,34 ou 1:02,03. Para tentativa sem tempo, selecione DNF.",
+      );
+      return;
+    }
+    if (video && !safeUrl(video)) {
+      setError("Informe um link de vídeo começando com https:// ou http://.");
+      return;
+    }
+    setBusy(true);
+    try {
+      await api(`/events/${eventId}/rounds/${round.id}/submissions`, "POST", {
+        attempts,
+        videoUrl: video.trim() || undefined,
+      });
+      setSaved(true);
+      onSaved();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div className="submission-box">
+      <div className="section-heading compact">
+        <h3>{previous ? "Seu envio" : "Enviar suas tentativas"}</h3>
+        {previous && <Status status={previous.status} />}
+      </div>
+      {previous?.reviewNote && (
+        <Notice kind={previous.status === "REJECTED" ? "warning" : "info"}>
+          <strong>Nota da organização:</strong> {previous.reviewNote}
+        </Notice>
+      )}
+      <p className="muted">
+        Digite o tempo sem somar a penalidade. A opção +2 acrescenta dois
+        segundos automaticamente. DNF significa tentativa não concluída.
+      </p>
+      <form onSubmit={submit}>
+        <fieldset disabled={expired || busy}>
+          <legend className="sr-only">Tempos e penalidades</legend>
+          <div className="attempts-grid">
+            {times.map((time, i) => (
+              <div className="attempt-field" key={i}>
+                <label htmlFor={`time-${round.id}-${i}`}>
+                  Tentativa {i + 1}
+                </label>
+                <input
+                  id={`time-${round.id}-${i}`}
+                  inputMode="decimal"
+                  placeholder="12,34"
+                  value={time}
+                  disabled={penalties[i] === "DNF"}
+                  onChange={(e) =>
+                    setTimes((values) =>
+                      values.map((v, k) => (k === i ? e.target.value : v)),
+                    )
+                  }
+                />
+                <label className="sr-only" htmlFor={`penalty-${round.id}-${i}`}>
+                  Penalidade da tentativa {i + 1}
+                </label>
+                <select
+                  id={`penalty-${round.id}-${i}`}
+                  value={penalties[i]}
+                  onChange={(e) =>
+                    setPenalties((values) =>
+                      values.map((v, k) =>
+                        k === i ? (e.target.value as Attempt["penalty"]) : v,
+                      ),
+                    )
+                  }
+                >
+                  <option value="NONE">Sem penalidade</option>
+                  <option value="PLUS2">+2 segundos</option>
+                  <option value="DNF">DNF</option>
+                </select>
+              </div>
+            ))}
+          </div>
+          <label className="field">
+            <span>
+              Link do vídeo {videoRequired ? "(obrigatório)" : "(opcional)"}
+            </span>
+            <input
+              type="url"
+              required={videoRequired}
+              value={video}
+              onChange={(e) => setVideo(e.target.value)}
+              placeholder="https://…"
+            />
+            <small>
+              Use um vídeo que a organização consiga abrir. Não envie senhas ou
+              arquivos privados.
+            </small>
+          </label>
+          <button className="button primary" type="submit">
+            {busy
+              ? "Enviando…"
+              : previous
+                ? "Corrigir e reenviar"
+                : "Enviar para revisão"}
+          </button>
+        </fieldset>
+      </form>
+      <p className="caption">
+        {expired
+          ? "O prazo foi encerrado. Não é mais possível substituir este envio."
+          : `Você pode corrigir este envio até ${dateLabel(round.closesAt)}. Cada reenvio volta para análise.`}
+      </p>
+      {previous?.videoUrl && safeUrl(previous.videoUrl) && (
+        <a
+          className="text-button"
+          href={safeUrl(previous.videoUrl)}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Abrir vídeo enviado <ArrowUpRight size={15} />
+        </a>
+      )}
+      {error && <Notice kind="error">{error}</Notice>}
+      {saved && (
+        <Notice kind="success">
+          <CheckCircle2 size={17} /> Envio salvo e aguardando revisão.
+        </Notice>
+      )}
+    </div>
+  );
 }

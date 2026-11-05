@@ -1,9 +1,85 @@
-export type User = {id:string; displayName:string; city?:string; photoUrl?:string; wcaId?:string; role:'ADMIN'|'ORGANIZER'|'COMPETITOR'};
-export type Algorithm = {id:string; name:string; category:'F2L'|'OLL'|'PLL'; algorithm:string; variations:string[]; orientation:string; notes:string; sourceUrl:string; sourceName:string; validated:boolean; method:string; puzzle:string};
-export type Content = Record<string,string>;
-export type Attempt = {timeCs:number|null; penalty:'NONE'|'PLUS2'|'DNF'};
-export type Submission = {id:string; roundId?:string; roundName?:string; displayName?:string; attempts:Attempt[]; videoUrl?:string; status:'PENDING'|'APPROVED'|'REJECTED'; reviewNote?:string; videoRequest?:string|{message:string}};
-export type Result = {id:string; userId:string; displayName:string; attempts:Attempt[]; status:string; averageCs:number|null; bestCs:number|null; rank:number|null};
-export type Round = {id:string; eventId:string; name:string; puzzle:'333'|'222'|'pyram'; format:'AO5'|'MO3'; opensAt:string; closesAt:string; videoRequired:boolean; published:boolean; scrambles?:string[]; mySubmission?:Submission|null; results?:Result[]; rankings?:Result[]; videoRequest?:string|{message:string}};
-export type Participant = {id:string; displayName:string; city?:string; wcaId?:string};
-export type CubeEvent = {id:string; name:string; description:string; rules:string; organizerName:string; registrationOpen:string; registrationClose:string; status:'DRAFT'|'OPEN'|'RUNNING'|'CLOSED'; published:boolean; rounds:Round[]; participantCount:number; participants?:Participant[]};
+export type User = {
+  id: string;
+  displayName: string;
+  city?: string;
+  photoUrl?: string;
+  wcaId?: string;
+  role: "ADMIN" | "ORGANIZER" | "COMPETITOR";
+};
+export type Algorithm = {
+  id: string;
+  name: string;
+  category: "F2L" | "OLL" | "PLL";
+  algorithm: string;
+  variations: string[];
+  orientation: string;
+  notes: string;
+  sourceUrl: string;
+  sourceName: string;
+  validated: boolean;
+  method: string;
+  puzzle: string;
+};
+export type Content = Record<string, string>;
+export type Attempt = {
+  timeCs: number | null;
+  penalty: "NONE" | "PLUS2" | "DNF";
+};
+export type Submission = {
+  id: string;
+  roundId?: string;
+  roundName?: string;
+  displayName?: string;
+  attempts: Attempt[];
+  videoUrl?: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  reviewNote?: string;
+  videoRequest?: string | { message: string };
+};
+export type AdminSubmission = Submission & { revision: number };
+export type Result = {
+  id: string;
+  userId: string;
+  displayName: string;
+  attempts: Attempt[];
+  status: string;
+  averageCs: number | null;
+  bestCs: number | null;
+  rank: number | null;
+};
+export type Round = {
+  id: string;
+  eventId: string;
+  name: string;
+  puzzle: "333" | "222" | "pyram";
+  format: "AO5" | "MO3";
+  opensAt: string;
+  closesAt: string;
+  videoRequired: boolean;
+  published: boolean;
+  scrambles?: string[];
+  mySubmission?: Submission | null;
+  results?: Result[];
+  rankings?: Result[];
+  videoRequest?: string | { message: string };
+};
+export type Participant = {
+  id: string;
+  displayName: string;
+  city?: string;
+  wcaId?: string;
+};
+export type CubeEvent = {
+  id: string;
+  name: string;
+  description: string;
+  rules: string;
+  organizerName: string;
+  registrationOpen: string;
+  registrationClose: string;
+  status: "DRAFT" | "OPEN" | "RUNNING" | "CLOSED";
+  published: boolean;
+  rounds: Round[];
+  participantCount: number;
+  participants?: Participant[];
+};

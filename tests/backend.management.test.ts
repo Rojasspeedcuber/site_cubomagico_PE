@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { handleApi } from '../lib/api.ts';
 import { pool, query } from '../lib/db.ts';
-import { rateLimit } from '../lib/auth.ts';
+import { rateLimit,tokenHash } from '../lib/auth.ts';
 const origin=process.env.APP_URL || 'http://localhost:3000';
 async function call(path:string,method='GET',body?:unknown,cookie?:string){const res=await handleApi(new Request(`${origin}/api/${path}`,{method,headers:{origin,...(cookie?{cookie}:{}),'content-type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)}));return {status:res.status,data:await res.json(),cookie:res.headers.get('set-cookie')?.split(';')[0]};}
 test('admin content, algorithm archive, roles and audit use persistent authorized operations', {skip:!process.env.DATABASE_URL},async()=>{
@@ -20,8 +20,11 @@ test('admin content, algorithm archive, roles and audit use persistent authorize
   assert.equal((await call('content')).data.data.welcome,'Fixture de teste');
   const algorithm={id:algId,name:'Fixture',category:'PLL',algorithm:"R U R'",sourceUrl:'https://example.test/source'};
   assert.equal((await call('admin/algorithms','POST',algorithm,owner.cookie)).status,201);
-  assert.ok((await call('algorithms')).data.data.some((a:any)=>a.id===algId));
-  assert.equal((await call(`admin/algorithms/${algId}`,'PATCH',{notes:'Revisado'},owner.cookie)).status,200);
+  assert.ok(!(await call('algorithms')).data.data.some((a:any)=>a.id===algId),'public catalog must hide unvalidated content');
+  assert.ok((await call('algorithms','GET',undefined,owner.cookie)).data.data.some((a:any)=>a.id===algId),'admins can review unpublished cases');
+  const updated=await call(`admin/algorithms/${algId}`,'PATCH',{notes:'Revisado',validated:true},owner.cookie);
+  assert.equal(updated.status,200);
+  assert.equal(updated.data.data.sourceUrl,algorithm.sourceUrl,'partial updates preserve omitted fields');
   assert.equal((await call('algorithms')).data.data.find((a:any)=>a.id===algId).notes,'Revisado');
   assert.equal((await call(`admin/algorithms/${algId}`,'DELETE',{},owner.cookie)).status,200);
   assert.ok(!(await call('algorithms')).data.data.some((a:any)=>a.id===algId));
@@ -32,6 +35,14 @@ test('admin content, algorithm archive, roles and audit use persistent authorize
   assert.equal((await call(`admin/users/${owner.id}`,'PATCH',{role:'COMPETITOR'},owner.cookie)).status,409);
   assert.ok((await call('admin/audit','GET',undefined,owner.cookie)).data.data.some((a:any)=>a.action==='ALGORITHM_ARCHIVED'));
   const key=`test-rate-${randomUUID()}`;await rateLimit(key,2,10);await rateLimit(key,2,10);await assert.rejects(()=>rateLimit(key,2,10),/Muitas tentativas/);
+  assert.equal((await query('SELECT hits FROM rate_limits WHERE key=$1',[tokenHash(key)]))[0].hits,3);
+  await query("UPDATE rate_limits SET reset_at=clock_timestamp()-interval '1 second' WHERE key=$1",[tokenHash(key)]);
+  await rateLimit(key,2,10);
+  assert.equal((await query('SELECT hits FROM rate_limits WHERE key=$1',[tokenHash(key)]))[0].hits,1);
+  await query("INSERT INTO rate_limits(key,hits,reset_at) VALUES($1,300,clock_timestamp()+interval '15 minutes') ON CONFLICT(key) DO UPDATE SET hits=300,reset_at=EXCLUDED.reset_at",[tokenHash(`writes:${member.id}`)]);
+  assert.equal((await call('profile','PATCH',{displayName:'Limited fixture'},member.cookie)).status,429);
+  assert.equal((await call('auth/logout','POST',{},member.cookie)).status,200,'logout remains possible when write-limited');
+  assert.equal((await call('session','GET',undefined,member.cookie)).data.data,null);
  } finally {
   await query('DELETE FROM algorithms WHERE id=$1',[algId]);
   if(previousWelcome!==undefined) await query('INSERT INTO content(key,value) VALUES($1,$2) ON CONFLICT(key) DO UPDATE SET value=EXCLUDED.value',['welcome',previousWelcome]);

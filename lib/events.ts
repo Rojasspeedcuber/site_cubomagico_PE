@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { query, transaction, audit, camel, type Db } from './db.ts';
 import { HttpError, canManage, assertWindow, authenticated, type User } from './policy.ts';
-import { parse, uuid, eventSchema, eventPatchSchema, roundSchema, submissionSchema } from './validation.ts';
+import { parse, parsePatch, uuid, eventSchema, eventPatchSchema, roundSchema, submissionSchema } from './validation.ts';
 import { generateScrambles } from './scrambles.ts';
 import { score, rankResults } from './scoring.ts';
 const id = (value:string) => parse(uuid,value);
@@ -67,7 +67,7 @@ export async function createEvent(user:User,payload:unknown) {
  return eventDto(event,user);
 }
 export async function updateEvent(eventId:string,user:User,payload:unknown) {
- const data=parse(eventPatchSchema,payload);
+ const data=parsePatch(eventPatchSchema,payload);
  await transaction(async db=>{
   const event=await eventRow(eventId,user,db,true,true);
   const open=data.registrationOpen ?? event.registration_open, close=data.registrationClose ?? event.registration_close;
@@ -118,24 +118,28 @@ export async function submit(eventId:string,roundId:string,user:User,payload:unk
   if((round.video_required || videoRequest) && !data.videoUrl) throw new HttpError(400,'O vídeo é obrigatório para este envio.');
   const scoring=score(round.format,data.attempts);
   const [result]=await query(`INSERT INTO submissions(round_id,user_id,attempts,video_url,average_cs,best_cs) VALUES($1,$2,$3::jsonb,$4,$5,$6)
-  ON CONFLICT(round_id,user_id) DO UPDATE SET attempts=EXCLUDED.attempts,video_url=EXCLUDED.video_url,average_cs=EXCLUDED.average_cs,best_cs=EXCLUDED.best_cs,status='PENDING',review_note='',updated_at=clock_timestamp()
-  RETURNING id,attempts,video_url,status,review_note`,[round.id,user.id,JSON.stringify(data.attempts),data.videoUrl,scoring.averageCs,scoring.bestCs],db);
+  ON CONFLICT(round_id,user_id) DO UPDATE SET attempts=EXCLUDED.attempts,video_url=EXCLUDED.video_url,average_cs=EXCLUDED.average_cs,best_cs=EXCLUDED.best_cs,status='PENDING',review_note='',revision=submissions.revision+1,updated_at=clock_timestamp()
+  RETURNING id,attempts,video_url,status,review_note,revision`,[round.id,user.id,JSON.stringify(data.attempts),data.videoUrl,scoring.averageCs,scoring.bestCs],db);
   await audit(db,user.id,'SUBMISSION_SAVED',result.id,{roundId:round.id}); return camel(result);
  });
 }
 export async function adminSubmissions(eventId:string,user:User) {
  await eventRow(eventId,user,undefined,true);
- return (await query('SELECT s.id,s.round_id,r.name AS round_name,u.display_name,s.attempts,s.video_url,s.status,s.review_note FROM submissions s JOIN rounds r ON r.id=s.round_id JOIN users u ON u.id=s.user_id WHERE r.event_id=$1 ORDER BY r.opens_at,u.display_name,s.id',[eventId])).map(camel);
+ return (await query('SELECT s.id,s.revision,s.round_id,r.name AS round_name,u.display_name,s.attempts,s.video_url,s.status,s.review_note FROM submissions s JOIN rounds r ON r.id=s.round_id JOIN users u ON u.id=s.user_id WHERE r.event_id=$1 ORDER BY r.opens_at,u.display_name,s.id',[eventId])).map(camel);
 }
 export async function review(submissionId:string,user:User,payload:unknown) {
- const data=parse(z.object({status:z.enum(['APPROVED','REJECTED']),reviewNote:z.string().trim().max(10000).default('')}),payload);
+ const data=parse(z.object({status:z.enum(['APPROVED','REJECTED']),reviewNote:z.string().trim().max(10000).default(''),expectedRevision:z.number().int().positive().max(2147483647)}),payload);
  return transaction(async db=>{
   const [reference]=await query('SELECT r.event_id,s.round_id FROM submissions s JOIN rounds r ON r.id=s.round_id WHERE s.id=$1',[id(submissionId)],db);
   if(!reference) throw new HttpError(404,'Envio não encontrado.');
   await eventRow(reference.event_id,user,db,true,true);
   const round=await roundRow(reference.event_id,reference.round_id,db,true);
   if(round.published) throw new HttpError(409,'Resultados publicados são imutáveis.');
-  const [row]=await query('UPDATE submissions SET status=$1,review_note=$2,updated_at=clock_timestamp() WHERE id=$3 RETURNING id,round_id,status,review_note',[data.status,data.reviewNote,submissionId],db);
+  const [evidence]=await query('SELECT s.revision,s.video_url,EXISTS(SELECT 1 FROM video_requests vr WHERE vr.round_id=s.round_id AND vr.user_id=s.user_id) AS requested FROM submissions s WHERE s.id=$1 FOR UPDATE OF s',[submissionId],db);
+  if(!evidence) throw new HttpError(404,'Envio não encontrado.');
+  if(evidence.revision!==data.expectedRevision) throw new HttpError(409,'Este envio foi alterado. Recarregue os envios e confira os tempos e o vídeo antes de revisar novamente.');
+  if(data.status==='APPROVED' && (round.video_required || evidence.requested) && !evidence.video_url) throw new HttpError(400,'O vídeo obrigatório deve ser anexado antes da aprovação.');
+  const [row]=await query('UPDATE submissions SET status=$1,review_note=$2,revision=revision+1,updated_at=clock_timestamp() WHERE id=$3 RETURNING id,round_id,status,review_note,revision',[data.status,data.reviewNote,submissionId],db);
   if(!row) throw new HttpError(404,'Envio não encontrado.');
   await audit(db,user.id,'SUBMISSION_REVIEWED',submissionId,{status:data.status}); return camel(row);
  });
@@ -160,7 +164,7 @@ export async function videoRequest(eventId:string,userId:string,user:User,payloa
   if(round.published || (await dbNow(db)).getTime()>=new Date(round.closes_at).getTime()) throw new HttpError(409,'Solicite o vídeo antes do encerramento da rodada.');
   if(!(await query('SELECT 1 FROM registrations WHERE round_id=$1 AND user_id=$2',[round.id,id(userId)],db)).length) throw new HttpError(404,'Participante não inscrito nesta rodada.');
   await query('INSERT INTO video_requests(round_id,user_id,actor_id,message) VALUES($1,$2,$3,$4) ON CONFLICT(round_id,user_id) DO UPDATE SET message=EXCLUDED.message,actor_id=EXCLUDED.actor_id,created_at=clock_timestamp()',[round.id,userId,user.id,data.message],db);
-  await query("UPDATE submissions SET status='PENDING',review_note='',updated_at=clock_timestamp() WHERE round_id=$1 AND user_id=$2",[round.id,userId],db);
+  await query("UPDATE submissions SET status='PENDING',review_note='',revision=revision+1,updated_at=clock_timestamp() WHERE round_id=$1 AND user_id=$2",[round.id,userId],db);
   await audit(db,user.id,'VIDEO_REQUESTED',userId,{eventId:event.id,roundId:round.id});
   return {roundId:round.id,userId,message:data.message};
  });

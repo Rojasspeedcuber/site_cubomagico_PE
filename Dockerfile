@@ -2,7 +2,7 @@
 FROM node:26-bookworm-slim AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --include=dev
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build

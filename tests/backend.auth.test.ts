@@ -15,6 +15,9 @@ test('persistent registration, session, profile, logout; cannot self-promote or 
   const data = await res.json(); assert.equal(data.data.role,'COMPETITOR'); assert.equal(data.data.email,undefined); assert.equal(data.data.passwordHash,undefined);
   const cookie = res.headers.get('set-cookie')!.split(';')[0];
   assert.ok(res.headers.get('set-cookie')!.includes('HttpOnly'));
+  const token=cookie.slice('session='.length);
+  const sessions=await query('SELECT token_hash FROM sessions WHERE user_id=$1',[data.data.id]);
+  assert.ok(sessions.every(s=>s.token_hash!==token && /^[a-f0-9]{64}$/.test(s.token_hash)));
   assert.equal((await (await call('session',undefined,cookie)).json()).data.id,data.data.id);
   assert.equal((await call('admin/events',{},cookie)).status,403);
   assert.equal((await call('auth/login',{email,password:'wrong-password'})).status,401);
@@ -25,5 +28,8 @@ test('persistent registration, session, profile, logout; cannot self-promote or 
   assert.equal((await call('auth/logout',{},cookie)).status,200);
   assert.equal((await (await call('session',undefined,cookie)).json()).data,null);
   const login = await call('auth/login',{email,password:'safe-long-passphrase'}); assert.equal(login.status,200);
+  const loggedInCookie=login.headers.get('set-cookie')!.split(';')[0];
+  await query("UPDATE sessions SET expires_at=clock_timestamp()-interval '1 second' WHERE user_id=$1",[data.data.id]);
+  assert.equal((await (await call('session',undefined,loggedInCookie)).json()).data,null);
  } finally {await query('DELETE FROM users WHERE email=$1',[email]); await pool.end();}
 });

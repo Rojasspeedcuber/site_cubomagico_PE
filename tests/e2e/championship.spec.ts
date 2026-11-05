@@ -6,7 +6,7 @@ const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 
 test.afterAll(async () => { await pool.end(); });
 
-test('fluxo persistente: cadastro, RBAC, inscrição, embaralhamento, revisão e publicação', async ({ playwright }) => {
+test('fluxo persistente: cadastro, RBAC, inscrição, embaralhamento, revisão e publicação', async ({ playwright, page, context }) => {
   test.skip(!process.env.DATABASE_URL, 'DATABASE_URL deve apontar para banco isolado de testes.');
   test.setTimeout(120_000);
   const contexts = await Promise.all(Array.from({ length: 4 }, () => playwright.request.newContext({ baseURL: origin, extraHTTPHeaders: { Origin: origin } })));
@@ -54,13 +54,46 @@ test('fluxo persistente: cadastro, RBAC, inscrição, embaralhamento, revisão e
     const submissions = await send(admin, 'GET', `/api/admin/events/${eventId}/submissions`);
     expect(submissions).toHaveLength(1);
     expect(submissions[0].status).toBe('PENDING');
-    await send(admin, 'PATCH', `/api/admin/submissions/${submissions[0].id}`, { status: 'APPROVED', reviewNote: 'Fixture aprovada.' });
+    await send(admin, 'PATCH', `/api/admin/submissions/${submissions[0].id}`, { status: 'APPROVED', expectedRevision: submissions[0].revision, reviewNote: 'Fixture aprovada.' });
+    await context.addCookies((await admin.storageState()).cookies);
+    await page.goto(`${origin}/admin`);
+    await page.locator('.admin-event-list article').filter({ hasText: event.name }).getByRole('button', { name: 'Gerenciar', exact: true }).click();
+    await page.getByRole('button', { name: 'Revisão de envios', exact: true }).click();
+    const card = page.locator('.review-card');
+    await expect(card.getByRole('link', { name: /Abrir vídeo/ })).toHaveAttribute('href', 'https://example.org/video-test');
+    const viewed = (await send(admin, 'GET', `/api/admin/events/${eventId}/submissions`))[0];
     await send(competitor, 'POST', submissionPath, { attempts, videoUrl: 'https://example.org/video-corrected' });
-    expect((await send(admin, 'GET', `/api/admin/events/${eventId}/submissions`))[0].status).toBe('PENDING');
+    const staleApproval = page.waitForResponse(res => res.request().method() === 'PATCH' && res.url().endsWith(`/api/admin/submissions/${submissions[0].id}`));
+    await card.getByRole('button', { name: 'Aprovar envio', exact: true }).click();
+    const staleResponse = await staleApproval;
+    expect(staleResponse.status()).toBe(409);
+    expect(staleResponse.request().postDataJSON().expectedRevision).toBe(viewed.revision);
+    await expect(page.getByText(/A lista está sendo atualizada/)).toBeVisible();
+    await expect(card.getByRole('link', { name: /Abrir vídeo/ })).toHaveAttribute('href', 'https://example.org/video-corrected');
+    const beforeVideoRequest = (await send(admin, 'GET', `/api/admin/events/${eventId}/submissions`))[0];
+    await send(admin, 'POST', `/api/admin/events/${eventId}/participants/${userIds[1]}/video-request`, { roundId: round.id, message: 'Conferir inspeção no vídeo.' });
+    await card.getByLabel('Observação para o participante').fill('Revisão da inspeção');
+    const staleRejection = page.waitForResponse(res => res.request().method() === 'PATCH' && res.url().endsWith(`/api/admin/submissions/${submissions[0].id}`));
+    await card.getByRole('button', { name: 'Rejeitar com observação', exact: true }).click();
+    const rejectionResponse = await staleRejection;
+    expect(rejectionResponse.status()).toBe(409);
+    expect(rejectionResponse.request().postDataJSON().expectedRevision).toBe(beforeVideoRequest.revision);
+    const afterVideoRequest = (await send(admin, 'GET', `/api/admin/events/${eventId}/submissions`))[0];
+    expect(afterVideoRequest.revision).toBeGreaterThan(beforeVideoRequest.revision);
+    expect(afterVideoRequest.status).toBe('PENDING');
+    // A fresh render must reset the outdated review note and use the new version.
+    await expect(card.getByLabel('Observação para o participante')).toHaveValue('');
+    const freshApproval = page.waitForResponse(res => res.request().method() === 'PATCH' && res.url().endsWith(`/api/admin/submissions/${submissions[0].id}`));
+    await card.getByRole('button', { name: 'Aprovar envio', exact: true }).click();
+    const freshResponse = await freshApproval;
+    expect(freshResponse.status()).toBe(200);
+    expect(freshResponse.request().postDataJSON().expectedRevision).toBe(afterVideoRequest.revision);
+    expect((await freshResponse.json()).data.revision).toBeGreaterThan(afterVideoRequest.revision);
     expect((await admin.post(`/api/admin/events/${eventId}/rounds/${round.id}/publish`, { data: {} })).status()).toBeGreaterThanOrEqual(400);
     await pool.query('UPDATE rounds SET closes_at = NOW() - interval \'1 second\' WHERE id=$1', [round.id]);
     expect((await competitor.post(submissionPath, { data: { attempts, videoUrl: 'https://example.org/late' } })).status()).toBe(403);
-    await send(admin, 'PATCH', `/api/admin/submissions/${submissions[0].id}`, { status: 'APPROVED', reviewNote: 'Revisão final.' });
+    const latest = (await send(admin, 'GET', `/api/admin/events/${eventId}/submissions`))[0];
+    await send(admin, 'PATCH', `/api/admin/submissions/${submissions[0].id}`, { status: 'APPROVED', expectedRevision: latest.revision, reviewNote: 'Revisão final.' });
     await send(admin, 'POST', `/api/admin/events/${eventId}/rounds/${round.id}/publish`, {});
     const published = await send(anonymous, 'GET', `/api/events/${eventId}/rounds/${round.id}`);
     expect(published.results).toHaveLength(1);

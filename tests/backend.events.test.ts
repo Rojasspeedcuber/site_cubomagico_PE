@@ -31,7 +31,10 @@ test('event lifecycle persists random scrambles, hides drafts, owner RBAC, selec
   const round=rounds[0];
   const stored=await query('SELECT scrambles,format FROM rounds WHERE event_id=$1',[eventId]);
   assert.equal(stored.length,3); for(const row of stored) {assert.equal(row.scrambles.length,row.format==='AO5'?5:3); assert.ok(row.scrambles.every((s:string)=>s.length>5));}
-  assert.equal((await call(`admin/events/${eventId}`,'PATCH',{status:'OPEN'},owner.cookie)).status,200);
+  const openedEvent=await call(`admin/events/${eventId}`,'PATCH',{status:'OPEN'},owner.cookie);
+  assert.equal(openedEvent.status,200);
+  assert.equal(openedEvent.body.data.description,'Fixture removida no fim','status patch must not erase description');
+  assert.equal(openedEvent.body.data.rules,'Não oficial','status patch must not erase rules');
   assert.deepEqual((await call(`events/${eventId}/rounds/${round.id}`)).body.data.scrambles,[]);
   assert.equal((await call(`events/${eventId}/register`,'POST',{roundIds:[round.id]},member.cookie)).status,200);
   assert.equal((await call(`admin/events/${eventId}/participants`,'GET',undefined,rival.cookie)).status,403);
@@ -48,23 +51,58 @@ test('event lifecycle persists random scrambles, hides drafts, owner RBAC, selec
   assert.equal((await call(endpoint,'POST',{attempts,videoUrl:'https://example.test/private-video'},member.cookie)).status,200);
   const pending=await call(`admin/events/${eventId}/submissions`,'GET',undefined,owner.cookie); const submission=pending.body.data[0];
   assert.equal(submission.videoUrl,'https://example.test/private-video');
-  assert.equal((await call(`admin/submissions/${submission.id}`,'PATCH',{status:'APPROVED',reviewNote:'ok'},rival.cookie)).status,403);
-  assert.equal((await call(`admin/submissions/${submission.id}`,'PATCH',{status:'APPROVED',reviewNote:'ok'},owner.cookie)).status,200);
-  assert.equal((await call(endpoint,'POST',{attempts,videoUrl:'https://example.test/corrected'},member.cookie)).status,200);
-  assert.equal((await call(`events/${eventId}/rounds/${round.id}`,'GET',undefined,member.cookie)).body.data.mySubmission.status,'PENDING');
+  const reviewPath=`admin/submissions/${submission.id}`;
+  assert.equal((await call(reviewPath,'PATCH',{status:'APPROVED',reviewNote:'ok',expectedRevision:submission.revision},rival.cookie)).status,403);
+  const approved=await call(reviewPath,'PATCH',{status:'APPROVED',reviewNote:'ok',expectedRevision:submission.revision},owner.cookie);
+  assert.equal(approved.status,200);
+  const correctedAttempts=attempts.map(a=>({...a,timeCs:a.timeCs+100}));
+  const replaced=await call(endpoint,'POST',{attempts:correctedAttempts,videoUrl:'https://example.test/corrected'},member.cookie);
+  assert.equal(replaced.status,200);
+  assert.equal(replaced.body.data.id,submission.id,'resubmission keeps the same ID');
+  for(const status of ['APPROVED','REJECTED']) {
+   const stale=await call(reviewPath,'PATCH',{status,expectedRevision:submission.revision},owner.cookie);
+   assert.equal(stale.status,409,'review must reject unseen replacement attempts/video');
+   assert.match(stale.body.error,/alterado|atualiz|recarreg/i);
+  }
+  assert.equal(submission.revision,1);
+  assert.ok(approved.body.data.revision>submission.revision);
+  assert.ok(replaced.body.data.revision>approved.body.data.revision);
+  const current=async()=> (await call(`admin/events/${eventId}/submissions`,'GET',undefined,owner.cookie)).body.data[0];
+  const beforeRequest=await current();
+  assert.equal(beforeRequest.revision,replaced.body.data.revision);
+  assert.deepEqual(beforeRequest.attempts,correctedAttempts);
+  assert.equal(beforeRequest.videoUrl,'https://example.test/corrected');
+  assert.equal(beforeRequest.status,'PENDING');
+  for(const expectedRevision of [undefined,0,-1,1.5,'1',null]) {
+   assert.equal((await call(reviewPath,'PATCH',{status:'APPROVED',expectedRevision},owner.cookie)).status,400,'a positive integer revision is mandatory');
+  }
   assert.equal((await call(`admin/events/${eventId}/participants/${member.id}/video-request`,'POST',{roundId:round.id,message:'Mostrar inspeção'},owner.cookie)).status,200);
-  assert.equal((await call(`events/${eventId}/rounds/${round.id}`,'GET',undefined,member.cookie)).body.data.videoRequest.message,'Mostrar inspeção');
+  for(const status of ['APPROVED','REJECTED']) {
+   assert.equal((await call(reviewPath,'PATCH',{status,expectedRevision:beforeRequest.revision},owner.cookie)).status,409,'video request invalidates previously viewed submission even when video exists');
+  }
+  let latest=await current();
+  assert.ok(latest.revision>beforeRequest.revision);
+  assert.equal(latest.status,'PENDING');
+  assert.equal((await call(reviewPath,'PATCH',{status:'REJECTED',reviewNote:'Verificar vídeo',expectedRevision:latest.revision},owner.cookie)).status,200);
+  latest=await current();
+  assert.equal(latest.status,'REJECTED');
+  assert.equal((await call(`admin/events/${eventId}/participants/${member.id}/video-request`,'POST',{roundId:round.id,message:'Mostrar nova inspeção'},owner.cookie)).status,200);
+  assert.equal((await call(reviewPath,'PATCH',{status:'APPROVED',expectedRevision:latest.revision},owner.cookie)).status,409,'updating a video request also invalidates review');
+  assert.equal((await current()).status,'PENDING');
+  assert.equal((await call(`events/${eventId}/rounds/${round.id}`,'GET',undefined,member.cookie)).body.data.videoRequest.message,'Mostrar nova inspeção');
   assert.deepEqual((await call(`events/${eventId}/rounds/${round.id}`)).body.data.results,[]);
   assert.ok((await call(`admin/events/${eventId}/rounds/${round.id}/publish`,'POST',{},owner.cookie)).status>=400);
   await query("UPDATE rounds SET closes_at=clock_timestamp()-interval '1 second' WHERE id=$1",[round.id]);
   assert.equal((await call(endpoint,'POST',{attempts,videoUrl:'https://example.test/late'},member.cookie)).status,403);
   assert.equal((await call(`admin/events/${eventId}/rounds/${round.id}/publish`,'POST',{},owner.cookie)).status,409);
-  await call(`admin/submissions/${submission.id}`,'PATCH',{status:'APPROVED',reviewNote:'final'},owner.cookie);
+  const finalReview=await call(reviewPath,'PATCH',{status:'APPROVED',reviewNote:'final',expectedRevision:(await current()).revision},owner.cookie);
+  assert.equal(finalReview.status,200);
   assert.equal((await call(`admin/events/${eventId}/rounds/${round.id}/publish`,'POST',{},owner.cookie)).status,200);
   const publicRound=(await call(`events/${eventId}/rounds/${round.id}`)).body.data;
-  assert.equal(publicRound.results[0].averageCs,1200); assert.equal(publicRound.results[0].rank,1);
+  assert.equal(publicRound.results[0].averageCs,1300); assert.equal(publicRound.results[0].rank,1);
+  assert.equal(publicRound.results[0].revision,undefined,'review revisions are not part of public rankings');
   assert.ok(!JSON.stringify(publicRound).includes('example.test')); assert.equal(publicRound.mySubmission,null);
-  assert.equal((await call(`admin/submissions/${submission.id}`,'PATCH',{status:'REJECTED'},admin.cookie)).status,409);
+  assert.equal((await call(reviewPath,'PATCH',{status:'REJECTED',expectedRevision:finalReview.body.data.revision},admin.cookie)).status,409);
   assert.equal((await call('admin/audit','GET',undefined,owner.cookie)).status,403);
   assert.ok((await call('admin/audit','GET',undefined,admin.cookie)).body.data.some((a:any)=>a.action==='ROUND_PUBLISHED'));
  } finally {if(eventId) await query('DELETE FROM events WHERE id=$1',[eventId]); if(ids.length) await query('DELETE FROM users WHERE id=ANY($1::uuid[])',[ids]); await pool.end();}

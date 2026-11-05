@@ -28,7 +28,7 @@ Os horários são armazenados como instantes UTC e apresentados em `America/Reci
 - Tempos são números inteiros de centésimos de segundo. A penalidade `+2` acrescenta 200 centésimos.
 - Em Ao5, descarta-se o melhor e o pior resultado; a média usa os três restantes. Um DNF é descartado como pior; dois ou mais tornam a média DNF.
 - Em Mo3, usam-se os três resultados. Qualquer DNF torna a média DNF.
-- Médias são arredondadas ao centésimo. DNF é um estado, nunca o número zero.
+- A precisão é de centésimos abaixo de dez minutos. A partir desse limite, tempos individuais são truncados para segundos e médias são arredondadas para segundos, conforme a referência adotada. DNF é um estado, nunca o número zero.
 - Médias empatadas são comparadas pelo melhor tempo individual. Igualdade também no melhor tempo mantém a mesma posição.
 - Consulte as referências e os testes antes de alterar estas regras. A implementação cobre os formatos e as modalidades documentados, não todo o regulamento da WCA.
 

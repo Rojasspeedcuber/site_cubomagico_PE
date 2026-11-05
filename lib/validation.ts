@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { HttpError } from './policy.ts';
+z.config(z.locales.pt());
 export const safeUrl = z.string().max(2048).refine(value => {
  if (!value) return true;
  try { const url = new URL(value); return ['https:','http:'].includes(url.protocol) && !url.username && !url.password; } catch { return false; }
@@ -21,6 +22,11 @@ export function parse<T>(schema:z.ZodType<T>,value:unknown):T {
  const result=schema.safeParse(value);
  if(!result.success) throw new HttpError(400,result.error.issues.map(i=>`${i.path.join('.')}: ${i.message}`).join('; '));
  return result.data;
+}
+// Zod 4 applies nested defaults even inside .partial(); PATCH must retain only supplied keys.
+export function parsePatch<T extends Record<string,unknown>>(schema:z.ZodType<T>,value:unknown):T {
+ const parsed=parse(schema,value);
+ return Object.fromEntries(Object.entries(parsed).filter(([key])=>Object.hasOwn(value as object,key))) as T;
 }
 export async function body(request:Request) {
  const length = Number(request.headers.get('content-length') || 0);

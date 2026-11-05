@@ -1,10 +1,153 @@
-'use client';
-import Link from 'next/link';
-import {useState} from 'react';
-import {ArrowRight,CalendarDays,Clock3,Trophy,Users} from 'lucide-react';
-import {useApi} from './api';
-import {dateLabel} from './frontend-utils';
-import {Empty,ErrorBox,Loading,PageHeading,Status} from './ui';
-import type {CubeEvent} from './types';
-export const puzzleName:Record<string,string>={'333':'Cubo 3×3','222':'Cubo 2×2',pyram:'Pyraminx'};
-export default function EventsView(){const {data,loading,error,reload}=useApi<CubeEvent[]>('/events');const [filter,setFilter]=useState('ALL');const events=(data||[]).filter(e=>filter==='ALL'||e.status===filter);return <div className="container page-section"><PageHeading eyebrow="Pratique com a comunidade" title="Campeonatos online" description="Resolva no seu espaço, envie seus tempos e acompanhe os resultados. Cada campeonato tem suas próprias regras e prazos."><div className="page-heading-icon"><Trophy size={42}/></div></PageHeading><div className="notice"><Clock3 size={19}/><span>Todos os horários são de Pernambuco (UTC−3). Campeonatos independentes, sem vínculo oficial com a WCA.</span></div><div className="chip-row" aria-label="Filtrar campeonatos">{[['ALL','Todos'],['OPEN','Inscrições abertas'],['RUNNING','Em andamento'],['CLOSED','Encerrados']].map(([key,label])=><button className={`chip ${filter===key?'selected':''}`} aria-pressed={filter===key} key={key} onClick={()=>setFilter(key)}>{label}</button>)}</div>{loading?<Loading label="Carregando campeonatos…"/>:error?<ErrorBox message={error} retry={reload}/>:!events.length?<Empty title="Nenhum campeonato por aqui ainda"><p>{filter==='ALL'?'Quando a organização publicar um campeonato, você encontrará os detalhes e a inscrição nesta página.':'Não há campeonatos com esse filtro.'}</p>{filter!=='ALL'&&<button className="button secondary" onClick={()=>setFilter('ALL')}>Ver todos</button>}</Empty>:<div className="events-grid">{events.map(event=><article className="event-card" key={event.id}><div className="event-visual" aria-hidden="true"><span/><span/><span/><Trophy size={44}/><span className="event-number">ONLINE</span></div><div className="event-card-body"><Status status={event.status}/><h2><Link href={`/campeonatos/${event.id}`}>{event.name}</Link></h2><p className="event-description">{event.description}</p><div className="puzzle-tags">{Array.from(new Set(event.rounds.map(r=>r.puzzle))).map(p=><span key={p}>{puzzleName[p]||p}</span>)}</div><div className="event-meta"><span><CalendarDays size={16}/> Inscrições até {dateLabel(event.registrationClose)}</span><span><Users size={16}/> {event.participantCount} {event.participantCount===1?'participante':'participantes'}</span></div><Link className="button primary" href={`/campeonatos/${event.id}`}>Ver campeonato <ArrowRight size={16}/></Link></div></article>)}</div>}<section className="how-it-works"><p className="eyebrow">Antes de começar</p><h2>Como funciona?</h2><div className="steps-grid">{[['01','Escolha seu desafio','Leia as regras e selecione as modalidades disponíveis no campeonato.'],['02','Resolva e registre','Use os embaralhamentos da rodada. Informe os tempos, penalidades e o vídeo solicitado.'],['03','Acompanhe a revisão','A organização analisa os envios e publica a classificação após o prazo.']].map(([n,title,text])=><div key={n}><span className="step-number">{n}</span><h3>{title}</h3><p>{text}</p></div>)}</div></section></div>}
+"use client";
+import Link from "next/link";
+import { useState } from "react";
+import { ArrowRight, CalendarDays, Clock3, Trophy, Users } from "lucide-react";
+import { useApi } from "./api";
+import { dateLabel } from "./frontend-utils";
+import { Empty, ErrorBox, Loading, PageHeading, Status } from "./ui";
+import type { CubeEvent } from "./types";
+export const puzzleName: Record<string, string> = {
+  "333": "Cubo 3×3",
+  "222": "Cubo 2×2",
+  pyram: "Pyraminx",
+};
+export default function EventsView() {
+  const { data, loading, error, reload } = useApi<CubeEvent[]>("/events");
+  const [filter, setFilter] = useState("ALL");
+  const events = (data || []).filter(
+    (e) => filter === "ALL" || e.status === filter,
+  );
+  return (
+    <div className="container page-section">
+      <PageHeading
+        eyebrow="Pratique com a comunidade"
+        title="Campeonatos online"
+        description="Resolva no seu espaço, envie seus tempos e acompanhe os resultados. Cada campeonato tem suas próprias regras e prazos."
+      >
+        <div className="page-heading-icon">
+          <Trophy size={42} />
+        </div>
+      </PageHeading>
+      <div className="notice">
+        <Clock3 size={19} />
+        <span>
+          Todos os horários são de Pernambuco (UTC−3). Campeonatos
+          independentes, sem vínculo oficial com a WCA.
+        </span>
+      </div>
+      <div className="chip-row" aria-label="Filtrar campeonatos">
+        {[
+          ["ALL", "Todos"],
+          ["OPEN", "Inscrições abertas"],
+          ["RUNNING", "Em andamento"],
+          ["CLOSED", "Encerrados"],
+        ].map(([key, label]) => (
+          <button
+            className={`chip ${filter === key ? "selected" : ""}`}
+            aria-pressed={filter === key}
+            key={key}
+            onClick={() => setFilter(key)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      {loading ? (
+        <Loading label="Carregando campeonatos…" />
+      ) : error ? (
+        <ErrorBox message={error} retry={reload} />
+      ) : !events.length ? (
+        <Empty title="Nenhum campeonato por aqui ainda">
+          <p>
+            {filter === "ALL"
+              ? "Quando a organização publicar um campeonato, você encontrará os detalhes e a inscrição nesta página."
+              : "Não há campeonatos com esse filtro."}
+          </p>
+          {filter !== "ALL" && (
+            <button
+              className="button secondary"
+              onClick={() => setFilter("ALL")}
+            >
+              Ver todos
+            </button>
+          )}
+        </Empty>
+      ) : (
+        <div className="events-grid">
+          {events.map((event) => (
+            <article className="event-card" key={event.id}>
+              <div className="event-visual" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+                <Trophy size={44} />
+                <span className="event-number">ONLINE</span>
+              </div>
+              <div className="event-card-body">
+                <Status status={event.status} />
+                <h2>
+                  <Link href={`/campeonatos/${event.id}`}>{event.name}</Link>
+                </h2>
+                <p className="event-description">{event.description}</p>
+                <div className="puzzle-tags">
+                  {Array.from(new Set(event.rounds.map((r) => r.puzzle))).map(
+                    (p) => (
+                      <span key={p}>{puzzleName[p] || p}</span>
+                    ),
+                  )}
+                </div>
+                <div className="event-meta">
+                  <span>
+                    <CalendarDays size={16} /> Inscrições até{" "}
+                    {dateLabel(event.registrationClose)}
+                  </span>
+                  <span>
+                    <Users size={16} /> {event.participantCount}{" "}
+                    {event.participantCount === 1
+                      ? "participante"
+                      : "participantes"}
+                  </span>
+                </div>
+                <Link
+                  className="button primary"
+                  href={`/campeonatos/${event.id}`}
+                >
+                  Ver campeonato <ArrowRight size={16} />
+                </Link>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+      <section className="how-it-works">
+        <p className="eyebrow">Antes de começar</p>
+        <h2>Como funciona?</h2>
+        <div className="steps-grid">
+          {[
+            [
+              "01",
+              "Escolha seu desafio",
+              "Leia as regras e selecione as modalidades disponíveis no campeonato.",
+            ],
+            [
+              "02",
+              "Resolva e registre",
+              "Use os embaralhamentos da rodada. Informe os tempos, penalidades e o vídeo solicitado.",
+            ],
+            [
+              "03",
+              "Acompanhe a revisão",
+              "A organização analisa os envios e publica a classificação após o prazo.",
+            ],
+          ].map(([n, title, text]) => (
+            <div key={n}>
+              <span className="step-number">{n}</span>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
