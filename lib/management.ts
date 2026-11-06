@@ -2,15 +2,12 @@ import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { query, transaction, audit, camel } from './db.ts';
 import { publicUser } from './auth.ts';
+import { resolveContent } from './community-config.ts';
 import { HttpError, type User } from './policy.ts';
-import { parse, parsePatch, uuid, contentKeys, contentSchema, algorithmSchema } from './validation.ts';
+import { parse, parsePatch, uuid, contentSchema, algorithmSchema } from './validation.ts';
 export async function getContent() {
- const defaults:Record<string,string>=Object.fromEntries(contentKeys.map(key=>[key,'']));
- defaults.communityName=process.env.COMMUNITY_NAME || 'Comunidade de Cubo Mágico';
- defaults.communityShortName=process.env.COMMUNITY_NAME || 'Cubo Mágico';
  const rows=await query('SELECT key,value FROM content');
- for(const row of rows) if(contentKeys.includes(row.key)) defaults[row.key]=row.value;
- return defaults;
+ return resolveContent(rows);
 }
 export async function updateContent(actor:User,payload:unknown) {
  const data=parse(contentSchema,payload);

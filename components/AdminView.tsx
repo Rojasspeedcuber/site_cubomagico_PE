@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -15,6 +15,8 @@ import {
   Users,
 } from "lucide-react";
 import ParticipantsAdmin from "./ParticipantsAdmin";
+import EventLifecycleTools from "./EventLifecycleTools";
+import MediaUpload from "./MediaUpload";
 import { useSite } from "./AppShell";
 import { api, useApi } from "./api";
 import {
@@ -135,6 +137,7 @@ const contentLabels: Record<string, string> = {
 };
 function AdminContent() {
   const resource = useApi<Content>("/content");
+  const formRef = useRef<HTMLFormElement>(null);
   const [error, setError] = useState(""),
     [success, setSuccess] = useState(false),
     [busy, setBusy] = useState(false);
@@ -167,7 +170,7 @@ function AdminContent() {
         <ErrorBox message={resource.error} retry={resource.reload} />
       ) : (
         resource.data && (
-          <form onSubmit={submit}>
+          <form onSubmit={submit} ref={formRef}>
             <div className="form-grid">
               {Object.entries(contentLabels).map(([key, label]) => (
                 <label
@@ -210,6 +213,12 @@ function AdminContent() {
                 atualização.
               </Notice>
             )}
+            <div className="form-grid">
+              {[["communityPhotoUrl", "Foto autorizada da comunidade"], ["developerPhotoUrl", "Foto autorizada do desenvolvedor"]].map(([field, label]) => <div key={field}>
+                <h3>{label}</h3>
+                <MediaUpload kind="photo" onUploaded={url => { const input=formRef.current?.elements.namedItem(field); if(input instanceof HTMLInputElement) input.value=url; }} />
+              </div>)}
+            </div>
             <button className="button primary" disabled={busy}>
               <Save size={16} />
               {busy ? "Salvando…" : "Salvar conteúdo"}
@@ -718,6 +727,7 @@ function ManageEvent({
             </div>
             {error && <Notice kind="error">{error}</Notice>}
             {success && <Notice kind="success">{success}</Notice>}
+            {tab === "rounds" && <EventLifecycleTools event={resource.data} onChange={resource.reload} onEventDeleted={onBack} />}
             {tab === "rounds" ? (
               <section className="panel">
                 <div className="section-heading compact">

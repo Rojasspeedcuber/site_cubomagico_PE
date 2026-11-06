@@ -25,6 +25,7 @@ import {
 import { api, useApi } from "./api";
 import { safeUrl } from "./frontend-utils";
 import type { Content, User } from "./types";
+import { SITE_URL, SUPPORT_EMAIL, OFFICIAL_LOGO_PATH } from "../lib/community-config";
 const SiteContext = createContext<{
   user: User | null;
   sessionLoading: boolean;
@@ -72,7 +73,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
     } catch {}
   }
   const name = content.data?.communityName || "Cubo Mágico Pernambuco";
-  const logo = safeUrl(content.data?.logoUrl);
+  const configuredLogo = content.data?.logoUrl;
+  const logo = configuredLogo === undefined || configuredLogo === `${SITE_URL}${OFFICIAL_LOGO_PATH}`
+    ? OFFICIAL_LOGO_PATH : safeUrl(configuredLogo);
   return (
     <SiteContext.Provider
       value={{
@@ -195,6 +198,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
               <Link href="/algoritmos">Acervo</Link>
               <Link href="/campeonatos">Campeonatos</Link>
               <Link href="/sobre">A comunidade</Link>
+              <Link href="/privacidade">Privacidade e dados</Link>
+              <a href={`mailto:${SUPPORT_EMAIL}`}>Suporte</a>
               {session.data &&
                 ["ADMIN", "ORGANIZER"].includes(session.data.role) && (
                   <Link href="/admin">

@@ -4,6 +4,7 @@ import { HttpError, canManage, assertWindow, authenticated, type User } from './
 import { parse, parsePatch, uuid, eventSchema, eventPatchSchema, roundSchema, submissionSchema } from './validation.ts';
 import { generateScrambles } from './scrambles.ts';
 import { score, rankResults } from './scoring.ts';
+import { enqueueNotification } from './notifications.ts';
 const id = (value:string) => parse(uuid,value);
 const roundFields = 'id,event_id,name,puzzle,format,opens_at,closes_at,video_required,published';
 export async function eventRow(eventId:string,user:User|null,db?:Db,manage=false,lock=false) {
@@ -135,13 +136,15 @@ export async function review(submissionId:string,user:User,payload:unknown) {
   await eventRow(reference.event_id,user,db,true,true);
   const round=await roundRow(reference.event_id,reference.round_id,db,true);
   if(round.published) throw new HttpError(409,'Resultados publicados são imutáveis.');
-  const [evidence]=await query('SELECT s.revision,s.video_url,EXISTS(SELECT 1 FROM video_requests vr WHERE vr.round_id=s.round_id AND vr.user_id=s.user_id) AS requested FROM submissions s WHERE s.id=$1 FOR UPDATE OF s',[submissionId],db);
+  const [evidence]=await query('SELECT s.user_id,s.revision,s.video_url,EXISTS(SELECT 1 FROM video_requests vr WHERE vr.round_id=s.round_id AND vr.user_id=s.user_id) AS requested FROM submissions s WHERE s.id=$1 FOR UPDATE OF s',[submissionId],db);
   if(!evidence) throw new HttpError(404,'Envio não encontrado.');
   if(evidence.revision!==data.expectedRevision) throw new HttpError(409,'Este envio foi alterado. Recarregue os envios e confira os tempos e o vídeo antes de revisar novamente.');
   if(data.status==='APPROVED' && (round.video_required || evidence.requested) && !evidence.video_url) throw new HttpError(400,'O vídeo obrigatório deve ser anexado antes da aprovação.');
   const [row]=await query('UPDATE submissions SET status=$1,review_note=$2,revision=revision+1,updated_at=clock_timestamp() WHERE id=$3 RETURNING id,round_id,status,review_note,revision',[data.status,data.reviewNote,submissionId],db);
   if(!row) throw new HttpError(404,'Envio não encontrado.');
-  await audit(db,user.id,'SUBMISSION_REVIEWED',submissionId,{status:data.status}); return camel(row);
+  await audit(db,user.id,'SUBMISSION_REVIEWED',submissionId,{status:data.status});
+  await enqueueNotification(db,evidence.user_id,'SUBMISSION_REVIEW',`${row.id}:${row.revision}`,reference.event_id);
+  return camel(row);
  });
 }
 export async function publish(eventId:string,roundId:string,user:User) {
@@ -163,9 +166,10 @@ export async function videoRequest(eventId:string,userId:string,user:User,payloa
   const event=await eventRow(eventId,user,db,true,true), round=await roundRow(event.id,data.roundId,db,true);
   if(round.published || (await dbNow(db)).getTime()>=new Date(round.closes_at).getTime()) throw new HttpError(409,'Solicite o vídeo antes do encerramento da rodada.');
   if(!(await query('SELECT 1 FROM registrations WHERE round_id=$1 AND user_id=$2',[round.id,id(userId)],db)).length) throw new HttpError(404,'Participante não inscrito nesta rodada.');
-  await query('INSERT INTO video_requests(round_id,user_id,actor_id,message) VALUES($1,$2,$3,$4) ON CONFLICT(round_id,user_id) DO UPDATE SET message=EXCLUDED.message,actor_id=EXCLUDED.actor_id,created_at=clock_timestamp()',[round.id,userId,user.id,data.message],db);
+  const [request]=await query('INSERT INTO video_requests(round_id,user_id,actor_id,message) VALUES($1,$2,$3,$4) ON CONFLICT(round_id,user_id) DO UPDATE SET message=EXCLUDED.message,actor_id=EXCLUDED.actor_id,created_at=clock_timestamp() RETURNING (extract(epoch FROM created_at)*1000000)::bigint::text AS notification_revision',[round.id,userId,user.id,data.message],db);
   await query("UPDATE submissions SET status='PENDING',review_note='',revision=revision+1,updated_at=clock_timestamp() WHERE round_id=$1 AND user_id=$2",[round.id,userId],db);
   await audit(db,user.id,'VIDEO_REQUESTED',userId,{eventId:event.id,roundId:round.id});
+  await enqueueNotification(db,userId,'VIDEO_REQUEST',`${round.id}:${request.notification_revision}`,event.id);
   return {roundId:round.id,userId,message:data.message};
  });
 }

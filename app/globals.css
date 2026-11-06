@@ -310,6 +310,46 @@ main:focus {
   height: 42px;
   object-fit: contain;
 }
+.privacy-sections {
+  display: grid;
+  gap: 20px;
+  max-width: 900px;
+}
+.privacy-sections h2 {
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.privacy-sections p + p {
+  margin-top: 12px;
+}
+.privacy-sections a {
+  color: var(--blue);
+  text-decoration: underline;
+}
+.media-upload {
+  padding: 16px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  margin: 16px 0;
+  overflow-wrap: anywhere;
+}
+.media-upload input {
+  max-width: 100%;
+  width: 100%;
+}
+.media-upload p,
+.wca-login p {
+  font-size: 12px;
+  margin: 8px 0;
+}
+.privacy-tools,
+.account-page > section,
+.wca-login {
+  margin-top: 24px;
+}
+.privacy-tools form {
+  margin-top: 24px;
+}
 .desktop-nav {
   display: flex;
   align-items: center;

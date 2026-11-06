@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { api, useApi } from "./api";
 import { useSite } from "./AppShell";
+import MediaUpload from "./MediaUpload";
 import { dateLabel, formatTime, parseTime, safeUrl } from "./frontend-utils";
 import { puzzleName } from "./EventsView";
 import { Empty, ErrorBox, Loading, Notice, PageHeading, Status } from "./ui";
@@ -496,10 +497,11 @@ function SubmissionForm({
               placeholder="https://…"
             />
             <small>
-              Use um vídeo que a organização consiga abrir. Não envie senhas ou
-              arquivos privados.
+              Cole um link acessível à organização ou envie o arquivo pelo controle abaixo.
+              Não inclua documentos ou dados pessoais desnecessários na gravação.
             </small>
           </label>
+          <MediaUpload kind="video" onUploaded={setVideo} />
           <button className="button primary" type="submit">
             {busy
               ? "Enviando…"

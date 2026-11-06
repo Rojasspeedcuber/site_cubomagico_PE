@@ -21,6 +21,13 @@ services:
       APP_URL: ${APP_URL:?Defina APP_URL no .env}
       COMMUNITY_NAME: ${COMMUNITY_NAME:-Comunidade Pernambucana de Cubo Mágico}
       NODE_ENV: production
+      MEDIA_STORAGE_DIR: /app/.data/media
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+      WCA_CLIENT_ID: ${WCA_CLIENT_ID:-}
+      WCA_CLIENT_SECRET: ${WCA_CLIENT_SECRET:-}
+    volumes:
+      - media-data:/app/.data/media
     depends_on:
       db:
         condition: service_healthy
@@ -28,3 +35,4 @@ services:
       - "127.0.0.1:3000:3000"
 volumes:
   postgres-data:
+  media-data:

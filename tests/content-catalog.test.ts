@@ -22,9 +22,9 @@ function f2lSolved(state: any, base: any) {
 test('catalog is an explicitly small, sourced, validated CFOP selection', () => {
   assert.ok(existsSync(dataUrl), 'missing sourced algorithm catalog');
   const cases = catalog();
-  assert.equal(cases.length, 6);
+  assert.equal(cases.length, 9);
   assert.equal(new Set(cases.map(c => c.id)).size, cases.length);
-  assert.deepEqual(cases.map(c => c.category).sort(), ['F2L', 'OLL', 'OLL', 'PLL', 'PLL', 'PLL']);
+  assert.deepEqual(cases.map(c => c.category).sort(), ['F2L', 'F2L', 'F2L', 'OLL', 'OLL', 'PLL', 'PLL', 'PLL', 'PLL']);
   for (const c of cases) {
     for (const field of ['id', 'name', 'algorithm', 'orientation', 'notes', 'sourceUrl', 'sourceName']) assert.ok(c[field]);
     assert.equal(c.method, 'CFOP'); assert.equal(c.puzzle, '333'); assert.equal(c.validated, true);
@@ -49,8 +49,8 @@ test('independent cubing/kpuzzle validates inverse solution and PLL piece permut
       const { EDGES, CORNERS } = canonical.patternData;
       assert.ok(EDGES.orientation.every(value => value === 0), c.id);
       assert.ok(CORNERS.orientation.every(value => value === 0), c.id);
-      assert.equal(EDGES.pieces.filter((value, index) => value !== index).length, c.id === 'pll-t' ? 2 : 3, c.id);
-      assert.equal(CORNERS.pieces.filter((value, index) => value !== index).length, c.id === 'pll-t' ? 2 : 0, c.id);
+      assert.equal(EDGES.pieces.filter((value, index) => value !== index).length, ['pll-t','pll-jb'].includes(c.id) ? 2 : 3, c.id);
+      assert.equal(CORNERS.pieces.filter((value, index) => value !== index).length, ['pll-t','pll-jb'].includes(c.id) ? 2 : 0, c.id);
     }
     if (c.category === 'OLL') {
       assert.ok(canonical.patternData.EDGES.orientation.every(value => value === 0));

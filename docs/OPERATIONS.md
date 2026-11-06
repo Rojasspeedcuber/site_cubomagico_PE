@@ -2,18 +2,19 @@
 
 ## Antes de abrir ao público
 
-- Receber o logotipo autorizado e preencher a URL no painel de conteúdo. A aplicação não trata os elementos geométricos de interface como logotipo oficial.
+- O logotipo recebido em `imgs/` já está incluído em `public/imgs/logo-cubo-pe.jpeg`. Conferir a apresentação e preservar as autorizações dos materiais institucionais.
 - Conferir as informações institucionais, os canais da comunidade, as fotografias e suas autorizações. Campos vazios não viram contatos ou histórias inventados.
 - Revisar o acervo e as fontes em `docs/SOURCES.md`. O conjunto inicial é parcial.
-- Usar um domínio com HTTPS e definir `APP_URL` com a origem exata, sem caminho. As escritas verificam a origem para proteção contra CSRF.
+- Provisionar DNS e HTTPS para `cubomagicope.rojasdev.site` e definir `APP_URL=https://cubomagicope.rojasdev.site`, sem caminho. As escritas verificam a origem para proteção contra CSRF. O domínio no código não implica deploy ou certificado emitido.
 - Proteger o PostgreSQL, sem porta pública. Dar à aplicação uma conta exclusiva, sem privilégios de superusuário.
-- Escolher uma política de privacidade, um prazo para retenção de vídeos e uma pessoa responsável por solicitações de exclusão. Nome, cidade e ID WCA são dados públicos de perfil; e-mails, sessões e links de vídeo não devem ser publicados nos resultados.
+- Revisar a política em `/privacidade`, os procedimentos de [dados e retenção](DATA-LIFECYCLE.md) e a rotação dos backups. O suporte confirmado é `henriquer01@rojasdev.cloud`. Nome, cidade e ID WCA são dados públicos de perfil; e-mails, sessões e links de vídeo não devem ser publicados nos resultados.
 - Não cadastrar competidores ou resultados de exemplo no banco de produção.
 
 ## Campeonato independente da comunidade
 
 1. O administrador concede o perfil de organizador à pessoa responsável. Um organizador só administra seus próprios eventos.
 2. O organizador cria o evento com descrição, regras e período de inscrição. Define as modalidades, os formatos, os horários de abertura e encerramento das rodadas e a exigência de vídeo.
+   Enquanto o evento for um rascunho sem inscrições, envios ou resultados publicados, pode editar/excluir rodadas ou excluir o evento em **Ajustes do rascunho**. Alterações de modalidade/formato geram novos embaralhamentos. O servidor revalida os bloqueios sob lock, mesmo que a tela esteja desatualizada.
 3. O servidor gera e guarda uma série de embaralhamentos por rodada com `cubing.js`. A mesma série é compartilhada com os inscritos após a abertura. Nunca reutilize um evento de teste como evento público.
 4. O organizador abre as inscrições. Cada competidor cria sua conta e escolhe as modalidades.
 5. Durante a rodada, cada participante consulta os embaralhamentos e envia os tempos na ordem, com penalidades e link de vídeo quando exigido. Um novo envio antes do prazo substitui o anterior e exige nova revisão.
@@ -43,8 +44,20 @@ pg_restore --no-owner --dbname="$DATABASE_URL" cubo-pe.backup
 
 Restaure primeiro em uma base separada e valide os dados. O volume `postgres-data` do Compose é persistente, mas não substitui backup externo. `docker compose down -v` apaga esse volume: não use em produção.
 
-Mantenha o relógio do servidor sincronizado. Revise auditoria e falhas de login; preserve logs sem gravar senhas, cookies, e-mails ou URLs privadas desnecessariamente.
+O volume de mídia também precisa de backup. Em Compose, `media-data` mantém arquivos em `/app/.data/media`, separados de `public`; fora de containers, configure `MEDIA_STORAGE_DIR` em um diretório persistente. O proxy deve aceitar uploads de até 101 MiB e nunca servir essa pasta diretamente.
+
+Mantenha o relógio do servidor sincronizado. Revise auditoria e falhas de login; preserve logs sem gravar senhas, cookies, e-mails ou URLs privadas desnecessariamente. Evite query strings do callback OAuth nos logs do proxy.
+
+## Retenção e solicitações de exclusão
+
+Execute `npx tsx scripts/retention.ts --dry-run` para conferir candidatos e `--apply` para limpar. A rotina remove referências de vídeos 90 dias após o encerramento da rodada e arquivos sem vínculo após 7 dias. Não há cron criado automaticamente; configure a execução e a monitoria antes de anunciar cumprimento automático desses prazos.
+
+A conta oferece exportação e exclusão com senha e confirmação `EXCLUIR`. A exclusão remove resultados do participante, inclusive publicados, além de perfil, inscrições, sessões e arquivos. Essa exceção de privacidade é distinta das alterações esportivas bloqueadas após a publicação. O último administrador e proprietários de eventos não podem excluir a conta antes de resolver suas responsabilidades.
+
+Para pedidos ao suporte, confirmar a identidade sem solicitar a senha, localizar os dados e explicar impedimentos. Contas somente WCA exigem um atendimento apropriado se não possuírem senha local utilizável. Retirar fotos institucionais quando a autorização for revogada e registrar a providência sem replicar dados desnecessários. Definir rotação de backups e reaplicar exclusões se houver restauração; arquivos em provedores externos exigem exclusão na origem.
 
 ## Limitações operacionais
 
-Não há envio de e-mails, confirmação de e-mail, recuperação automática de senha, armazenamento de fotos/vídeos ou integração com login WCA. Fotos e vídeos são links HTTPS; o organizador precisa conferir permissão de acesso e autorização. Configure esses serviços separadamente se passarem a ser necessários. A criação de rodadas não promete embaralhamentos oficiais de uma competição WCA. Não publique este serviço na internet sem revisar as políticas de privacidade e os procedimentos de suporte.
+Confirmação de e-mail e recuperação usam Resend mediante `RESEND_API_KEY` e `MAIL_FROM`, com remetente autorizado; consulte [AUTH.md](AUTH.md). A confirmação local é opcional. Login WCA depende de credenciais OAuth e callback registrado; consulte [WCA-AUTH.md](WCA-AUTH.md). Sem configuração, esses serviços ficam explicitamente indisponíveis, enquanto o cadastro local continua funcionando.
+
+Há upload local de fotos públicas e vídeos privados, mas não há transcodificação, antivírus ou remoção de EXIF. A organização deve conferir o arquivo e a autorização de uso. Links externos continuam permitidos e sujeitos às regras do provedor. A criação de rodadas não promete embaralhamentos oficiais de uma competição WCA. Backups, DNS/HTTPS, monitoramento e revisão jurídica continuam sendo responsabilidades da operação.

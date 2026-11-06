@@ -1,5 +1,10 @@
 import * as events from './events.ts';
 import * as management from './management.ts';
+import { handleWcaAuth } from './wca-auth.ts';
+import { handleAccountAuth } from './account-auth.ts';
+import { handleEventLifecycle } from './event-lifecycle.ts';
+import { handleMediaPrivacy } from './privacy.ts';
+import { handleNotifications } from './notifications.ts';
 import { z } from 'zod';
 import { query, transaction, audit } from './db.ts';
 import { sessionUser, publicUser, hashPassword, verifyPassword, createSession, readToken, tokenHash, sessionCookie, rateLimit } from './auth.ts';
@@ -13,6 +18,16 @@ export async function handleApi(request:Request): Promise<Response> {
   if (!['GET','HEAD','OPTIONS'].includes(method)) requireOrigin(request);
   const user = await sessionUser(request);
   if(user && !['GET','HEAD','OPTIONS'].includes(method) && path.join('/')!=='auth/logout') await rateLimit(`writes:${user.id}`,300);
+  const wcaResponse=await handleWcaAuth(request,user);
+  if(wcaResponse) return wcaResponse;
+  const accountResponse=await handleAccountAuth(request,user);
+  if(accountResponse) return accountResponse;
+  const notificationResponse=await handleNotifications(request,user);
+  if(notificationResponse) return notificationResponse;
+  const mediaPrivacyResponse=await handleMediaPrivacy(request,user);
+  if(mediaPrivacyResponse) return mediaPrivacyResponse;
+  const lifecycleResponse=await handleEventLifecycle(request,user);
+  if(lifecycleResponse) return lifecycleResponse;
   if(method==='GET' && path.join('/')==='session') return json(user);
   if(method==='GET' && path.join('/')==='content') return json(await management.getContent());
   if(method==='GET' && path.join('/')==='algorithms') return json(await management.listAlgorithms(user?.role==='ADMIN'));
@@ -40,15 +55,24 @@ export async function handleApi(request:Request): Promise<Response> {
     }
     const data=parse(loginSchema,payload);
     await rateLimit(`auth:email:${data.email}`,20);
-    const [row]=await query('SELECT * FROM users WHERE email=$1',[data.email]);
-    // Equal-cost hash on unknown accounts to limit email enumeration timing.
-    const stored=row?.password_hash || `scrypt$${'0'.repeat(32)}$${'0'.repeat(128)}`;
-    if(!await verifyPassword(data.password,stored) || !row) throw new HttpError(401,'Email ou senha inválidos.');
-    return json(publicUser(row),200,{'Set-Cookie':await createSession(row.id)});
+    // Verify and issue the session under the account lock: a concurrent password reset waits for this commit and then revokes the session.
+    const result = await transaction(async db=>{
+      const [row]=await query('SELECT * FROM users WHERE email=$1 FOR UPDATE',[data.email],db);
+      // Equal-cost hash on unknown accounts to limit email enumeration timing.
+      const stored=row?.password_hash || `scrypt$${'0'.repeat(32)}$${'0'.repeat(128)}`;
+      const valid = await verifyPassword(data.password,stored);
+      if(!valid || !row) return null;
+      return {row, cookie: await createSession(row.id,db)};
+    });
+    if(!result) throw new HttpError(401,'Email ou senha inválidos.');
+    return json(publicUser(result.row),200,{'Set-Cookie':result.cookie});
    }
   }
   if(method==='PATCH' && path.join('/')==='profile') {
    const actor=authenticated(user); const data=parse(profileSchema,await body(request));
+   // Profile photos may reference only photo media; a video URL here would pin the file past retention.
+   const photoMatch=/^\/api\/media\/([0-9a-f-]{36})$/i.exec(data.photoUrl);
+   if(photoMatch && !(await query("SELECT 1 FROM media WHERE id=$1 AND kind='photo'",[photoMatch[1]]))[0]) throw new HttpError(400,'A foto do perfil deve ser uma imagem enviada ao site.');
    return json(await transaction(async db=>{
     const [row]=await query('UPDATE users SET display_name=$1,city=$2,photo_url=$3,wca_id=$4 WHERE id=$5 RETURNING *',[data.displayName,data.city,data.photoUrl,data.wcaId,actor.id],db);
     await audit(db,actor.id,'PROFILE_UPDATED',actor.id);

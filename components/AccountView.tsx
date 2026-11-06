@@ -7,6 +7,11 @@ import { api } from "./api";
 import { SignOut, useSite } from "./AppShell";
 import { Loading, Notice, PageHeading } from "./ui";
 import { safeReturnTo, safeUrl } from "./frontend-utils";
+import { AuthTools } from "./AuthTools";
+import WcaLogin from './WcaLogin';
+import MediaUpload from './MediaUpload';
+import PrivacyTools from './PrivacyTools';
+import NotificationPreferences from './NotificationPreferences';
 export default function AccountView() {
   const { user, sessionLoading, sessionError, refreshSession } = useSite();
   const [mode, setMode] = useState<"login" | "register">("login"),
@@ -43,7 +48,7 @@ export default function AccountView() {
   }
   return (
     <div className="container page-section account-page">
-      {sessionLoading ? (
+      {sessionLoading && !user ? (
         <Loading label="Verificando sua sessão…" />
       ) : user ? (
         <>
@@ -225,6 +230,7 @@ export default function AccountView() {
                 <ArrowRight size={17} />
               </button>
             </form>
+            <WcaLogin />
             <p className="caption">
               A conta é destinada à participação neste site. Não é uma conta da
               WCA.
@@ -232,11 +238,15 @@ export default function AccountView() {
           </section>
         </div>
       )}
+      <AuthTools signedIn={!!user} onSessionChange={refreshSession} />
+      {user && <NotificationPreferences key={user.id} />}
+      {user && <PrivacyTools onDeleted={refreshSession} />}
     </div>
   );
 }
 function ProfileForm() {
   const { user, refreshSession } = useSite();
+  const [photo, setPhoto] = useState(user?.photoUrl || "");
   const [error, setError] = useState(""),
     [success, setSuccess] = useState(false),
     [busy, setBusy] = useState(false);
@@ -308,7 +318,8 @@ function ProfileForm() {
           <input
             name="photoUrl"
             type="url"
-            defaultValue={user.photoUrl || ""}
+            value={photo}
+            onChange={event => setPhoto(event.target.value)}
             placeholder="https://…"
           />
           <small>
@@ -316,6 +327,7 @@ function ProfileForm() {
             avatar padrão.
           </small>
         </label>
+        <MediaUpload kind="photo" onUploaded={setPhoto} />
         {error && <Notice kind="error">{error}</Notice>}
         {success && <Notice kind="success">Perfil atualizado.</Notice>}
         <button disabled={busy} className="button primary">

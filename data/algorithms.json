@@ -14,6 +14,34 @@
     "puzzle": "333"
   },
   {
+    "id": "f2l-insercao-ajuste-u",
+    "name": "Inserção à direita com ajuste U",
+    "category": "F2L",
+    "algorithm": "U R U' R'",
+    "variations": [],
+    "orientation": "Centro amarelo em U (cima), branco em D (baixo) e verde em F (frente). Slot-alvo entre F e R, à frente e à direita. Comece no alinhamento da figura; o U inicial faz parte da sequência.",
+    "notes": "Outra inserção básica para um par já formado. O ajuste U inicial posiciona o par antes de inseri-lo no slot frontal direito. Preserva a cruz branca e os outros três slots. A figura mostra o estado exato preparado pelo inverso da sequência, não um par separado qualquer. Consulte também a inserção básica à direita para comparar os alinhamentos.",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/f2l.pdf",
+    "sourceName": "CubeSkills — F2L Algorithms, Feliks Zemdegs e Andy Klise (Basic Inserts, página 1)",
+    "validated": true,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "f2l-aresta-no-slot",
+    "name": "Aresta no slot, canto em cima",
+    "category": "F2L",
+    "algorithm": "U R U R' U2 R U R'",
+    "variations": [],
+    "orientation": "Centro amarelo em U (cima), branco em D (baixo) e verde em F (frente). A aresta entre F e R já está no slot frontal direito; o canto correspondente está em U. Alinhe o canto com a figura e mantenha o U inicial da sequência.",
+    "notes": "Resolve o par frontal direito quando a aresta já está no lugar e o canto ainda está na camada de cima, no alinhamento mostrado. A sequência trabalha o par e termina com uma inserção básica. Preserva a cruz branca e os outros três slots. A figura vem do inverso exato da solução; não use este caso para qualquer orientação de canto com a aresta no slot.",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/f2l.pdf",
+    "sourceName": "CubeSkills — F2L Algorithms, Feliks Zemdegs e Andy Klise (Edge in Place, Corner in U face, página 2)",
+    "validated": true,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
     "id": "oll-sune",
     "name": "Sune",
     "category": "OLL",
@@ -51,6 +79,20 @@
     "notes": "Permuta dois cantos adjacentes e duas arestas da última camada. Mantém a orientação da última camada e as duas primeiras camadas. A figura representa o caso exato sem ajuste U adicional; outros alinhamentos podem exigir AUF antes e/ou depois. Seleção inicial: não inclui todos os casos PLL.",
     "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
     "sourceName": "CubeSkills — PLL Algorithms, Feliks Zemdegs e Andy Klise (T)",
+    "validated": true,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-jb",
+    "name": "Permutação Jb",
+    "category": "PLL",
+    "algorithm": "R U R' F' R U R' U' R' F R2 U' R' U'",
+    "variations": [],
+    "orientation": "Centro amarelo em U (cima), branco em D (baixo) e verde em F (frente). Mantenha a barra lateral resolvida à esquerda (L) e alinhe as demais peças com a figura.",
+    "notes": "Troca dois cantos adjacentes e duas arestas adjacentes da última camada. Preserva a orientação e as duas primeiras camadas. O U' final já inclui o ajuste de camada indicado entre colchetes na fonte; não o omita para resolver o estado mostrado. A figura vem do inverso da sequência completa. Outros alinhamentos podem exigir AUF antes e/ou depois.",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
+    "sourceName": "CubeSkills — PLL Algorithms, Feliks Zemdegs e Andy Klise (Swap One Set of Adjacent Corners, Jb, página 2)",
     "validated": true,
     "method": "CFOP",
     "puzzle": "333"

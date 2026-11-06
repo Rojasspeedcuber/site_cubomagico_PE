@@ -1,6 +1,6 @@
 {
   "name": "comunidade-cubo-pe", "version": "1.0.0", "private": true, "type": "module",
-  "scripts": {"dev":"next dev --hostname 0.0.0.0", "build":"next build", "start":"next start --hostname 0.0.0.0", "test":"node scripts/test-isolated.mjs --unit", "test:integration":"node scripts/test-isolated.mjs", "test:e2e":"node --env-file=.env.test.local node_modules/@playwright/test/cli.js test", "typecheck":"tsc --noEmit", "db:migrate":"tsx scripts/migrate.ts", "db:seed":"tsx scripts/seed.ts", "admin":"tsx scripts/admin.ts"},
+  "scripts": {"dev":"next dev --hostname 0.0.0.0", "build":"next build", "start":"next start --hostname 0.0.0.0", "test":"node scripts/test-isolated.mjs --unit", "test:integration":"node scripts/test-isolated.mjs", "test:e2e":"node --env-file=.env.test.local node_modules/@playwright/test/cli.js test", "test:e2e:isolated":"node scripts/test-browser.mjs", "typecheck":"tsc --noEmit", "db:migrate":"tsx scripts/migrate.ts", "db:seed":"tsx scripts/seed.ts", "admin":"tsx scripts/admin.ts"},
   "dependencies": {"next":"16.4.5", "react":"19.2.4", "react-dom":"19.2.4", "pg":"^8.16.3", "zod":"^4.3.6", "cubing":"0.66.1", "lucide-react":"^0.577.0"},
   "devDependencies": {"typescript":"^5.9.3", "tsx":"^4.21.0", "@types/node":"^24.0.0", "@types/react":"^19.2.0", "@types/react-dom":"^19.2.0", "@types/pg":"^8.15.5", "@playwright/test":"^1.58.2"}
 }
