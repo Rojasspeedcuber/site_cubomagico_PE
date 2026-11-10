@@ -6,13 +6,13 @@ import { Alg } from 'cubing/alg';
 const dataUrl = new URL('../data/algorithms.json', import.meta.url);
 const catalog = (): any[] => JSON.parse(readFileSync(dataUrl, 'utf8'));
 
-test('catalog is the sourced e-book CFOP set: 41 F2L, 57 OLL, 21 PLL', () => {
+test('catalog is the sourced e-book CFOP set: 41 F2L, 57 OLL, 14 verified PLL', () => {
   assert.ok(existsSync(dataUrl), 'missing algorithm catalog');
   const cases = catalog();
-  assert.equal(cases.length, 119);
+  assert.equal(cases.length, 112); // 41 F2L + 57 OLL + 14 PLL verified; 7 PLL pending figure review
   assert.equal(new Set(cases.map(c => c.id)).size, cases.length);
   const count = (k: string) => cases.filter(c => c.category === k).length;
-  assert.equal(count('F2L'), 41); assert.equal(count('OLL'), 57); assert.equal(count('PLL'), 21);
+  assert.equal(count('F2L'), 41); assert.equal(count('OLL'), 57); assert.equal(count('PLL'), 14);
   for (const c of cases) {
     for (const field of ['id', 'name', 'algorithm', 'orientation', 'notes', 'sourceUrl', 'sourceName']) assert.ok(c[field], `${c.id}: ${field}`);
     assert.equal(c.method, 'CFOP'); assert.equal(c.puzzle, '333');

@@ -95,10 +95,9 @@ test('novo F2L mantém aresta no slot e insere canto sem desfazer cruz e demais 
   }
 });
 
-test('PLL Jb do e-book fica marcado como divergente, sem ser publicado como correto', async () => {
+test('PLL Jb usa a sequência completa verificada no cubo', async () => {
   const entry = catalog.find((candidate: any) => candidate.id === 'pll-jb');
   assert.ok(entry, 'pll-jb ausente');
-  assert.equal(entry.algorithm, "x R2 F R F' R U2");
-  assert.match(entry.notes, /Divergência/);
-  assert.match(entry.notes, /Não publicar como correta/);
+  assert.equal(entry.algorithm, "x R2 F R F' R U2 r' U r U2 x'");
+  assert.doesNotMatch(entry.notes, /Divergência/);
 });
