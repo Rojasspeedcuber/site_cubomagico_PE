@@ -7,8 +7,8 @@ test('acervo: busca, diagramas cube-icons e progresso local persistente', async 
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(page.locator('.ci svg').first()).toBeVisible({ timeout: 20000 });
   await expect(page.getByRole('searchbox')).toBeVisible();
-  await page.getByRole('searchbox').fill('Sune');
-  await expect(page.getByText('Sune', { exact: true }).first()).toBeVisible();
+  await page.getByRole('searchbox').fill('OLL caso 1');
+  await expect(page.getByText('OLL caso 1', { exact: true }).first()).toBeVisible();
   await page.getByRole('searchbox').fill('nenhum-caso-com-este-texto');
   await expect(page.getByText(/nenhum (algoritmo|caso|resultado)/i).first()).toBeVisible();
   await page.getByRole('searchbox').fill('');

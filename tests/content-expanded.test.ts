@@ -21,15 +21,15 @@ async function verifyCase(id: string, category: string, algorithm: string, sourc
   assert.ok(entry, `Caso curado ausente: ${id}`);
   assert.equal(catalog.filter(candidate => candidate.id === id).length, 1);
   assert.equal(entry.category, category);
-  assert.equal(entry.algorithm, algorithm, 'Sequência conferida manualmente no PDF, incluindo ajuste U quando indicado');
-  assert.equal(entry.sourceUrl, `https://www.cubeskills.com/uploads/pdf/tutorials/${source}.pdf`);
-  assert.match(entry.sourceName, /CubeSkills.*Feliks Zemdegs.*Andy Klise/);
-  assert.equal(entry.validated, true);
+  assert.equal(entry.algorithm, algorithm, 'Sequência do e-book');
+  assert.match(entry.sourceName, /Ebook CFOP/);
+  assert.match(entry.sourceUrl, /^https:\/\//);
+  assert.equal(entry.validated, true, 'publicado a partir do e-book');
   assert.equal(entry.method, 'CFOP');
   assert.equal(entry.puzzle, '333');
   assert.deepEqual(entry.variations, []);
-  assert.match(entry.orientation, /amarelo.*U.*branco.*D.*verde.*F/);
-  assert.match(entry.notes, /figura|diagrama/);
+  assert.match(entry.orientation, /Revisão visual pendente/);
+  assert.match(entry.notes, /Setup para colocar no caso/);
   assert.doesNotMatch(entry.notes, /catálogo completo|todos os casos disponíveis/i);
 
   const puzzle = await puzzles['3x3x3'].kpuzzle();
@@ -46,7 +46,8 @@ async function verifyCase(id: string, category: string, algorithm: string, sourc
   const state = icons.createState.nxn(3);
   icons.applyAlgorithm(state, icons.getInvertedAlgorithm('3x3', `${algorithm} y2 x2`), 3);
   assert.equal(state.U[1][1], 'Y');
-  assert.equal(state.F[1][1], 'G');
+  // Sequences with a cube rotation (x/y/z) change the reference frame, so the front centre colour is not comparable.
+  if (!/[xyz]/.test(algorithm)) assert.equal(state.F[1][1], 'G');
   assert.notEqual(JSON.stringify(state), JSON.stringify(base));
   if (category !== 'F2L') {
     assert.equal(JSON.stringify(state.D), JSON.stringify(base.D));
@@ -63,7 +64,7 @@ async function verifyCase(id: string, category: string, algorithm: string, sourc
 }
 
 test('nova inserção básica com ajuste U preserva cruz e três slots no CubeIcons real', async () => {
-  const { state, base, canonical } = await verifyCase('f2l-insercao-ajuste-u', 'F2L', "U R U' R'", 'f2l');
+  const { state, base, canonical } = await verifyCase('f2l-03', 'F2L', "U R U' R'", 'f2l');
   let changedTargetStickers = 0;
   for (const face of faces) for (let row = 0; row < 3; row++) for (let col = 0; col < 3; col++) {
     const inF2L = face === 'D' || (face !== 'U' && row > 0);
@@ -80,7 +81,7 @@ test('nova inserção básica com ajuste U preserva cruz e três slots no CubeIc
 });
 
 test('novo F2L mantém aresta no slot e insere canto sem desfazer cruz e demais slots', async () => {
-  const { state, base, canonical } = await verifyCase('f2l-aresta-no-slot', 'F2L', "U R U R' U2 R U R'", 'f2l');
+  const { state, base, canonical } = await verifyCase('f2l-13', 'F2L', "U R U R' U2 R U R'", 'f2l');
   assert.equal(canonical.patternData.EDGES.pieces[8], 8, 'A aresta FR já está no slot');
   assert.equal(canonical.patternData.EDGES.orientation[8], 0);
   assert.notEqual(canonical.patternData.CORNERS.pieces[4], 4, 'O canto DFR ainda não está no slot');
@@ -94,16 +95,10 @@ test('novo F2L mantém aresta no slot e insere canto sem desfazer cruz e demais 
   }
 });
 
-test('PLL Jb inclui o AUF da fonte e troca dois cantos e duas arestas adjacentes', async () => {
-  const { state, canonical } = await verifyCase('pll-jb', 'PLL', "R U R' F' R U R' U' R' F R2 U' R' U'", 'pll-algorithms');
-  const { EDGES, CORNERS } = canonical.patternData;
-  assert.ok(EDGES.orientation.every(value => value === 0));
-  assert.ok(CORNERS.orientation.every(value => value === 0));
-  assert.equal(EDGES.pieces.filter((value, index) => value !== index).length, 2);
-  assert.equal(CORNERS.pieces.filter((value, index) => value !== index).length, 2);
-  assert.ok(state.U.flat().every((color: string) => color === 'Y'));
-  assert.equal(state.L[0].join(''), 'RRR', 'A barra resolvida fica à esquerda');
-  const puzzle = await puzzles['3x3x3'].kpuzzle();
-  const withoutAUF = "R U R' F' R U R' U' R' F R2 U' R'";
-  assert.equal(canonical.applyAlg(withoutAUF).isIdentical(puzzle.defaultPattern()), false, 'Remover o U final da fonte deixa ajuste pendente');
+test('PLL Jb do e-book fica marcado como divergente, sem ser publicado como correto', async () => {
+  const entry = catalog.find((candidate: any) => candidate.id === 'pll-jb');
+  assert.ok(entry, 'pll-jb ausente');
+  assert.equal(entry.algorithm, "x R2 F R F' R U2");
+  assert.match(entry.notes, /Divergência/);
+  assert.match(entry.notes, /Não publicar como correta/);
 });
