@@ -339,7 +339,7 @@
     "id": "oll-p3",
     "name": "P3 (caso 43 da tabela)",
     "category": "OLL",
-    "algorithm": "f' L' U' L U f",
+    "algorithm": "y R' U' F' U F R",
     "variations": [],
     "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
     "notes": "Probabilidade 1/54 segundo a tabela de OLL da CubeSkills. Sequência principal da tabela, sem variações nesta entrega. Adicionado com validação apenas textual; não marcado como revisado.",
@@ -451,7 +451,7 @@
     "id": "oll-k1",
     "name": "K1 (caso 13 da tabela)",
     "category": "OLL",
-    "algorithm": "F U R U' R2' F' R U R U' R'",
+    "algorithm": "r U' r' U' r U r' y' R' U R",
     "variations": [],
     "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
     "notes": "Probabilidade 1/54 segundo a tabela de OLL da CubeSkills. Sequência principal da tabela, sem variações nesta entrega. Adicionado com validação apenas textual; não marcado como revisado.",
@@ -507,7 +507,7 @@
     "id": "oll-a1",
     "name": "A1 (caso 29 da tabela)",
     "category": "OLL",
-    "algorithm": "M U R U R' U' R' F R F' M'",
+    "algorithm": "y R U R' U' R U' R' F' U' F R U R'",
     "variations": [],
     "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
     "notes": "Probabilidade 1/54 segundo a tabela de OLL da CubeSkills. Sequência principal da tabela, sem variações nesta entrega. Adicionado com validação apenas textual; não marcado como revisado.",
@@ -773,7 +773,7 @@
     "id": "oll-o6",
     "name": "O6 (caso 18 da tabela)",
     "category": "OLL",
-    "algorithm": "r U R' U R U2 r' r' U' R U' R' U2 r",
+    "algorithm": "y R U2' R2' F R F' U2' M' U R U' r'",
     "variations": [],
     "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
     "notes": "Probabilidade 1/54 segundo a tabela de OLL da CubeSkills. Sequência principal da tabela, sem variações nesta entrega. Adicionado com validação apenas textual; não marcado como revisado.",
@@ -821,6 +821,270 @@
     "notes": "Probabilidade 1/216 segundo a tabela de OLL da CubeSkills. Sequência principal da tabela, sem variações nesta entrega. Adicionado com validação apenas textual; não marcado como revisado.",
     "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/oll-algorithms.pdf",
     "sourceName": "CubeSkills — OLL Algorithms (Feliks Zemdegs e Andy Klise)",
+    "validated": false,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-z",
+    "name": "Permutação Z",
+    "category": "PLL",
+    "algorithm": "M2' U M2' U M' U2 M2' U2 M'",
+    "variations": [
+      "y' M' U M2' U M2' U M' U2 M2"
+    ],
+    "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
+    "notes": "Probabilidade 1/36 segundo a tabela de PLL da CubeSkills. Sequência principal (primeira da tabela); variações listadas à parte. Sem validação visual. Ajuste de face U indicado pela fonte: [U2] (não incluso na sequência). Ajustes de face U nas variações indicados pela fonte: [U'].",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
+    "sourceName": "CubeSkills — PLL Algorithms (Feliks Zemdegs e Andy Klise)",
+    "validated": false,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-h",
+    "name": "Permutação H",
+    "category": "PLL",
+    "algorithm": "M2' U M2' U2 M2' U M2'",
+    "variations": [],
+    "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
+    "notes": "Probabilidade 1/72 segundo a tabela de PLL da CubeSkills. Sequência principal (primeira da tabela); variações listadas à parte. Sem validação visual.",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
+    "sourceName": "CubeSkills — PLL Algorithms (Feliks Zemdegs e Andy Klise)",
+    "validated": false,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-aa",
+    "name": "Permutação Aa",
+    "category": "PLL",
+    "algorithm": "x R' U R' D2 R U' R' D2 R2 x'",
+    "variations": [
+      "y x' R2 D2 R' U' R D2 R' U R' x"
+    ],
+    "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
+    "notes": "Probabilidade 1/18 segundo a tabela de PLL da CubeSkills. Sequência principal (primeira da tabela); variações listadas à parte. Sem validação visual.",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
+    "sourceName": "CubeSkills — PLL Algorithms (Feliks Zemdegs e Andy Klise)",
+    "validated": false,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-ab",
+    "name": "Permutação Ab",
+    "category": "PLL",
+    "algorithm": "x R2' D2 R U R' D2 R U' R x'",
+    "variations": [
+      "y x' R U' R D2 R' U R D2 R2' x"
+    ],
+    "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
+    "notes": "Probabilidade 1/18 segundo a tabela de PLL da CubeSkills. Sequência principal (primeira da tabela); variações listadas à parte. Sem validação visual.",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
+    "sourceName": "CubeSkills — PLL Algorithms (Feliks Zemdegs e Andy Klise)",
+    "validated": false,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-e",
+    "name": "Permutação E",
+    "category": "PLL",
+    "algorithm": "x' R U' R' D R U R' D' R U R' D R U' R' D' x",
+    "variations": [],
+    "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
+    "notes": "Probabilidade 1/36 segundo a tabela de PLL da CubeSkills. Sequência principal (primeira da tabela); variações listadas à parte. Sem validação visual.",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
+    "sourceName": "CubeSkills — PLL Algorithms (Feliks Zemdegs e Andy Klise)",
+    "validated": false,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-ga",
+    "name": "Permutação Ga",
+    "category": "PLL",
+    "algorithm": "R2 U R' U R' U' R U' R2 D U' R' U R D'",
+    "variations": [
+      "R2 u R' U R' U' R u' R2 y' R' U R"
+    ],
+    "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
+    "notes": "Probabilidade 1/18 segundo a tabela de PLL da CubeSkills. Sequência principal (primeira da tabela); variações listadas à parte. Sem validação visual. Ajuste de face U indicado pela fonte: [U] (não incluso na sequência).",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
+    "sourceName": "CubeSkills — PLL Algorithms (Feliks Zemdegs e Andy Klise)",
+    "validated": false,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-gb",
+    "name": "Permutação Gb",
+    "category": "PLL",
+    "algorithm": "F' U' F R2 u R' U R U' R u' R2'",
+    "variations": [
+      "y' R' U' y F R2 u R' U R U' R u' R2'",
+      "y' D R' U' R U D' R2 U R' U R U' R U' R2'"
+    ],
+    "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
+    "notes": "Probabilidade 1/18 segundo a tabela de PLL da CubeSkills. Sequência principal (primeira da tabela); variações listadas à parte. Sem validação visual. Ajustes de face U nas variações indicados pela fonte: [U'].",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
+    "sourceName": "CubeSkills — PLL Algorithms (Feliks Zemdegs e Andy Klise)",
+    "validated": false,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-gc",
+    "name": "Permutação Gc",
+    "category": "PLL",
+    "algorithm": "R2 U' R U' R U R' U R2 D' U R U' R' D",
+    "variations": [
+      "y2 R2' F2 R U2' R U2' R' F R U R' U' R' F R2"
+    ],
+    "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
+    "notes": "Probabilidade 1/18 segundo a tabela de PLL da CubeSkills. Sequência principal (primeira da tabela); variações listadas à parte. Sem validação visual. Ajuste de face U indicado pela fonte: [U'] (não incluso na sequência).",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
+    "sourceName": "CubeSkills — PLL Algorithms (Feliks Zemdegs e Andy Klise)",
+    "validated": false,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-gd",
+    "name": "Permutação Gd",
+    "category": "PLL",
+    "algorithm": "D' R U R' U' D R2 U' R U' R' U R' U R2",
+    "variations": [
+      "R U R' y' R2 u' R U' R' U R' u R2"
+    ],
+    "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
+    "notes": "Probabilidade 1/18 segundo a tabela de PLL da CubeSkills. Sequência principal (primeira da tabela); variações listadas à parte. Sem validação visual. Ajuste de face U indicado pela fonte: [U] (não incluso na sequência).",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
+    "sourceName": "CubeSkills — PLL Algorithms (Feliks Zemdegs e Andy Klise)",
+    "validated": false,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-ra",
+    "name": "Permutação Ra",
+    "category": "PLL",
+    "algorithm": "R U' R' U' R U R D R' U' R D' R' U2 R'",
+    "variations": [
+      "y' L U2 L' U2 L F' L' U' L U L F L2'",
+      "R U R' F' R U2' R' U2' R' F R U R U2' R'"
+    ],
+    "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
+    "notes": "Probabilidade 1/18 segundo a tabela de PLL da CubeSkills. Sequência principal (primeira da tabela); variações listadas à parte. Sem validação visual. Ajuste de face U indicado pela fonte: [U'] (não incluso na sequência). Ajustes de face U nas variações indicados pela fonte: [U], [U'].",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
+    "sourceName": "CubeSkills — PLL Algorithms (Feliks Zemdegs e Andy Klise)",
+    "validated": false,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-rb",
+    "name": "Permutação Rb",
+    "category": "PLL",
+    "algorithm": "R' U2 R U2' R' F R U R' U' R' F' R2",
+    "variations": [
+      "R' U2 R' D' R U' R' D R U R U' R' U' R"
+    ],
+    "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
+    "notes": "Probabilidade 1/18 segundo a tabela de PLL da CubeSkills. Sequência principal (primeira da tabela); variações listadas à parte. Sem validação visual. Ajuste de face U indicado pela fonte: [U'] (não incluso na sequência). Ajustes de face U nas variações indicados pela fonte: [U'].",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
+    "sourceName": "CubeSkills — PLL Algorithms (Feliks Zemdegs e Andy Klise)",
+    "validated": false,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-ja",
+    "name": "Permutação Ja",
+    "category": "PLL",
+    "algorithm": "R' U L' U2 R U' R' U2 R L",
+    "variations": [
+      "y' L' U' L F L' U' L U L F' L2' U L"
+    ],
+    "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
+    "notes": "Probabilidade 1/18 segundo a tabela de PLL da CubeSkills. Sequência principal (primeira da tabela); variações listadas à parte. Sem validação visual. Ajuste de face U indicado pela fonte: [U'] (não incluso na sequência). Ajustes de face U nas variações indicados pela fonte: [U].",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
+    "sourceName": "CubeSkills — PLL Algorithms (Feliks Zemdegs e Andy Klise)",
+    "validated": false,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-f",
+    "name": "Permutação F",
+    "category": "PLL",
+    "algorithm": "R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R",
+    "variations": [
+      "y R' U2 R' U' y R' F' R2 U' R' U R' F R U' F"
+    ],
+    "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
+    "notes": "Probabilidade 1/18 segundo a tabela de PLL da CubeSkills. Sequência principal (primeira da tabela); variações listadas à parte. Sem validação visual.",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
+    "sourceName": "CubeSkills — PLL Algorithms (Feliks Zemdegs e Andy Klise)",
+    "validated": false,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-v",
+    "name": "Permutação V",
+    "category": "PLL",
+    "algorithm": "R' U R' U' y R' F' R2 U' R' U R' F R F",
+    "variations": [],
+    "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
+    "notes": "Probabilidade 1/18 segundo a tabela de PLL da CubeSkills. Sequência principal (primeira da tabela); variações listadas à parte. Sem validação visual.",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
+    "sourceName": "CubeSkills — PLL Algorithms (Feliks Zemdegs e Andy Klise)",
+    "validated": false,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-y",
+    "name": "Permutação Y",
+    "category": "PLL",
+    "algorithm": "F R U' R' U' R U R' F' R U R' U' R' F R F'",
+    "variations": [],
+    "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
+    "notes": "Probabilidade 1/18 segundo a tabela de PLL da CubeSkills. Sequência principal (primeira da tabela); variações listadas à parte. Sem validação visual.",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
+    "sourceName": "CubeSkills — PLL Algorithms (Feliks Zemdegs e Andy Klise)",
+    "validated": false,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-na",
+    "name": "Permutação Na",
+    "category": "PLL",
+    "algorithm": "z U R' D R2 U' R D' U R' D R2 U' R D' z'",
+    "variations": [],
+    "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
+    "notes": "Probabilidade 1/72 segundo a tabela de PLL da CubeSkills. Sequência principal (primeira da tabela); variações listadas à parte. Sem validação visual. Ajustes de face U indicados pela fonte, fora da sequência: [R'].",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
+    "sourceName": "CubeSkills — PLL Algorithms (Feliks Zemdegs e Andy Klise)",
+    "validated": false,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-nb",
+    "name": "Permutação Nb",
+    "category": "PLL",
+    "algorithm": "R' U R U' R' F' U' F R U R' F R' F' R U' R",
+    "variations": [
+      "R' U L' U2 R U' L R' U L' U2 R U' L"
+    ],
+    "orientation": "Revisão visual pendente: conferir o estado inicial na figura da fonte (CubeSkills).",
+    "notes": "Probabilidade 1/72 segundo a tabela de PLL da CubeSkills. Sequência principal (primeira da tabela); variações listadas à parte. Sem validação visual. Ajustes de face U nas variações indicados pela fonte: [U].",
+    "sourceUrl": "https://www.cubeskills.com/uploads/pdf/tutorials/pll-algorithms.pdf",
+    "sourceName": "CubeSkills — PLL Algorithms (Feliks Zemdegs e Andy Klise)",
     "validated": false,
     "method": "CFOP",
     "puzzle": "333"
