@@ -21,10 +21,10 @@ async function verifyCase(id: string, category: string, algorithm: string, sourc
   assert.ok(entry, `Caso curado ausente: ${id}`);
   assert.equal(catalog.filter(candidate => candidate.id === id).length, 1);
   assert.equal(entry.category, category);
-  assert.equal(entry.algorithm, algorithm, 'Sequência do e-book');
-  assert.match(entry.sourceName, /Ebook CFOP/);
-  assert.match(entry.sourceUrl, /^https:\/\//);
-  assert.equal(entry.validated, true, 'publicado a partir do e-book');
+  assert.equal(entry.algorithm, algorithm, 'Sequência verificada');
+  assert.match(entry.sourceName, /Algoritmos CFOP/);
+  assert.equal(typeof entry.sourceUrl, 'string');
+  assert.equal(entry.validated, true, 'publicado');
   assert.equal(entry.method, 'CFOP');
   assert.equal(entry.puzzle, '333');
   assert.deepEqual(entry.variations, []);

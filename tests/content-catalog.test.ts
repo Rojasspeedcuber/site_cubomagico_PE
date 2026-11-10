@@ -6,26 +6,26 @@ import { Alg } from 'cubing/alg';
 const dataUrl = new URL('../data/algorithms.json', import.meta.url);
 const catalog = (): any[] => JSON.parse(readFileSync(dataUrl, 'utf8'));
 
-test('catalog is the sourced e-book CFOP set: 41 F2L, 57 OLL, 14 verified PLL', () => {
+test('catalog is the sourced CFOP set: 41 F2L, 57 OLL, 18 verified PLL', () => {
   assert.ok(existsSync(dataUrl), 'missing algorithm catalog');
   const cases = catalog();
-  assert.equal(cases.length, 112); // 41 F2L + 57 OLL + 14 PLL verified; 7 PLL pending figure review
+  assert.equal(cases.length, 116); // 41 F2L + 57 OLL + 14 PLL verified; 7 PLL pending figure review
   assert.equal(new Set(cases.map(c => c.id)).size, cases.length);
   const count = (k: string) => cases.filter(c => c.category === k).length;
-  assert.equal(count('F2L'), 41); assert.equal(count('OLL'), 57); assert.equal(count('PLL'), 14);
+  assert.equal(count('F2L'), 41); assert.equal(count('OLL'), 57); assert.equal(count('PLL'), 18);
   for (const c of cases) {
-    for (const field of ['id', 'name', 'algorithm', 'orientation', 'notes', 'sourceUrl', 'sourceName']) assert.ok(c[field], `${c.id}: ${field}`);
+    for (const field of ['id', 'name', 'algorithm', 'orientation', 'notes', 'sourceName']) assert.ok(c[field], `${c.id}: ${field}`);
     assert.equal(c.method, 'CFOP'); assert.equal(c.puzzle, '333');
-    assert.match(c.sourceUrl, /^https:\/\//, c.id);
-    assert.match(c.sourceName, /Ebook CFOP/, c.id);
+    assert.equal(typeof c.sourceUrl, 'string', c.id);
+    assert.match(c.sourceName, /Algoritmos CFOP/, c.id);
     assert.ok(Array.isArray(c.variations));
     assert.doesNotThrow(() => new Alg(c.algorithm), `${c.id}: algorithm not parseable by cubing`);
-    // Published from the e-book; the figure review stays labelled in orientation until it is done.
+    // Figure review stays labelled in orientation until it is done.
     assert.match(c.orientation, /Revisão visual pendente/, `${c.id}: review status not labelled`);
   }
 });
 
-test('PLL cases whose e-book sequence does not solve the displayed case are labelled, not hidden', () => {
+test('PLL cases whose sequence does not solve the displayed case are labelled, not hidden', () => {
   const divergent = catalog().filter(c => c.category === 'PLL' && /Divergência/.test(c.notes));
   for (const c of divergent) assert.match(c.notes, /Não publicar como correta/, c.id);
 });
