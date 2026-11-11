@@ -56,3 +56,14 @@ test('every PLL is drawn in the top view, with or without arrows (as in the e-bo
   assert.match(src, /category === 'PLL'\)\s*\{?/, 'PLL branch');
   assert.doesNotMatch(src, /category === 'PLL' && arrows\)\s*\{\s*\/\/ Top view/, 'top view must not depend on arrows');
 });
+
+test('PLL swap arrows stay on the yellow top face (no lateral sticker arrows)', () => {
+  const pll = algorithms.filter(c => c.category === 'PLL' && (c as any).arrows);
+  assert.ok(pll.length >= 17, `expected at least 17 PLL with arrows, got ${pll.length}`);
+  for (const c of pll as Array<Algorithm & { arrows: string }>) {
+    for (const a of c.arrows.split(',')) {
+      const [from, to] = a.split(':')[0].split('->');
+      assert.ok(from.startsWith('U') && to.startsWith('U'), `${c.id}: arrow ${a} leaves the yellow face`);
+    }
+  }
+});

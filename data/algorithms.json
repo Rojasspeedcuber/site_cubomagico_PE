@@ -1384,7 +1384,7 @@
     "validated": true,
     "method": "CFOP",
     "puzzle": "333",
-    "arrows": "U5->U3:#ff3b30,U7->U5:#ff3b30,U3->U7:#ff3b30,B1->R1:#ff3b30,R1->L1:#ff3b30,L1->B1:#ff3b30"
+    "arrows": "U5->U3:#ff3b30,U7->U5:#ff3b30,U3->U7:#ff3b30"
   },
   {
     "id": "pll-ub",
@@ -1399,7 +1399,7 @@
     "validated": true,
     "method": "CFOP",
     "puzzle": "333",
-    "arrows": "U7->U3:#ff3b30,U3->U5:#ff3b30,U5->U7:#ff3b30,L1->R1:#ff3b30,B1->L1:#ff3b30,R1->B1:#ff3b30"
+    "arrows": "U7->U3:#ff3b30,U3->U5:#ff3b30,U5->U7:#ff3b30"
   },
   {
     "id": "pll-h",
@@ -1414,7 +1414,7 @@
     "validated": true,
     "method": "CFOP",
     "puzzle": "333",
-    "arrows": "U7->U1:#ff3b30,U5->U3:#ff3b30,U3->U5:#ff3b30,U1->U7:#ff3b30,L1->R1:#ff3b30,B1->F1:#ff3b30,R1->L1:#ff3b30,F1->B1:#ff3b30"
+    "arrows": "U7->U1:#ff3b30,U5->U3:#ff3b30,U3->U5:#ff3b30,U1->U7:#ff3b30"
   },
   {
     "id": "pll-z",
@@ -1429,7 +1429,7 @@
     "validated": true,
     "method": "CFOP",
     "puzzle": "333",
-    "arrows": "U5->U1:#ff3b30,U7->U3:#ff3b30,U1->U5:#ff3b30,U3->U7:#ff3b30,F1->R1:#ff3b30,R1->F1:#ff3b30,B1->L1:#ff3b30,L1->B1:#ff3b30"
+    "arrows": "U5->U1:#ff3b30,U7->U3:#ff3b30,U1->U5:#ff3b30,U3->U7:#ff3b30"
   },
   {
     "id": "pll-t",
@@ -1444,7 +1444,7 @@
     "validated": true,
     "method": "CFOP",
     "puzzle": "333",
-    "arrows": "U8->U2:#ff3b30,U5->U3:#ff3b30,U3->U5:#ff3b30,U2->U8:#ff3b30,B0->R0:#ff3b30,L1->R1:#ff3b30,F2->R2:#ff3b30,R2->F2:#ff3b30,R1->L1:#ff3b30,R0->B0:#ff3b30"
+    "arrows": "U8->U2:#ff3b30,U5->U3:#ff3b30,U3->U5:#ff3b30,U2->U8:#ff3b30"
   },
   {
     "id": "pll-ja",
@@ -1459,7 +1459,7 @@
     "validated": true,
     "method": "CFOP",
     "puzzle": "333",
-    "arrows": "U5->U1:#ff3b30,U8->U2:#ff3b30,U1->U5:#ff3b30,U2->U8:#ff3b30,B0->R0:#ff3b30,F1->R1:#ff3b30,F2->R2:#ff3b30,R1->F1:#ff3b30,R2->F2:#ff3b30,R0->B0:#ff3b30"
+    "arrows": "U5->U1:#ff3b30,U8->U2:#ff3b30,U1->U5:#ff3b30,U2->U8:#ff3b30"
   },
   {
     "id": "pll-jb",
@@ -1474,7 +1474,7 @@
     "validated": true,
     "method": "CFOP",
     "puzzle": "333",
-    "arrows": "U8->U2:#ff3b30,U7->U5:#ff3b30,U5->U7:#ff3b30,U2->U8:#ff3b30,B0->R0:#ff3b30,B1->R1:#ff3b30,F2->R2:#ff3b30,R2->F2:#ff3b30,R0->B0:#ff3b30,R1->B1:#ff3b30"
+    "arrows": "U8->U2:#ff3b30,U7->U5:#ff3b30,U5->U7:#ff3b30,U2->U8:#ff3b30"
   },
   {
     "id": "pll-ra",
@@ -1489,7 +1489,7 @@
     "validated": true,
     "method": "CFOP",
     "puzzle": "333",
-    "arrows": "U5->U1:#ff3b30,U1->U5:#ff3b30,U8->U6:#ff3b30,U6->U8:#ff3b30,F1->R1:#ff3b30,B2->R2:#ff3b30,R1->F1:#ff3b30,B0->L0:#ff3b30,L0->B0:#ff3b30,R2->B2:#ff3b30"
+    "arrows": "U5->U1:#ff3b30,U1->U5:#ff3b30,U8->U6:#ff3b30,U6->U8:#ff3b30"
   },
   {
     "id": "pll-rb",
@@ -1504,7 +1504,7 @@
     "validated": true,
     "method": "CFOP",
     "puzzle": "333",
-    "arrows": "U8->U0:#ff3b30,U5->U1:#ff3b30,U1->U3:#ff3b30,U3->U5:#ff3b30,U0->U6:#ff3b30,U6->U8:#ff3b30,L1->R1:#ff3b30,B2->R2:#ff3b30,B0->F0:#ff3b30,R1->F1:#ff3b30,F0->L0:#ff3b30,F1->L1:#ff3b30,R2->L2:#ff3b30,L0->B0:#ff3b30,L2->B2:#ff3b30"
+    "arrows": "U8->U0:#ff3b30,U5->U1:#ff3b30,U1->U3:#ff3b30,U3->U5:#ff3b30,U0->U6:#ff3b30,U6->U8:#ff3b30"
   },
   {
     "id": "pll-v",
@@ -1534,7 +1534,7 @@
     "validated": true,
     "method": "CFOP",
     "puzzle": "333",
-    "arrows": "U5->U1:#ff3b30,U8->U2:#ff3b30,U7->U3:#ff3b30,U3->U5:#ff3b30,U1->U7:#ff3b30,U2->U8:#ff3b30,B0->R0:#ff3b30,L1->R1:#ff3b30,F2->R2:#ff3b30,R1->F1:#ff3b30,R2->F2:#ff3b30,B1->L1:#ff3b30,R0->B0:#ff3b30,F1->B1:#ff3b30"
+    "arrows": "U5->U1:#ff3b30,U8->U2:#ff3b30,U7->U3:#ff3b30,U3->U5:#ff3b30,U1->U7:#ff3b30,U2->U8:#ff3b30"
   },
   {
     "id": "pll-gb",
@@ -1549,7 +1549,7 @@
     "validated": true,
     "method": "CFOP",
     "puzzle": "333",
-    "arrows": "U7->U1:#ff3b30,U8->U2:#ff3b30,U5->U3:#ff3b30,U1->U5:#ff3b30,U3->U7:#ff3b30,U2->U8:#ff3b30,B0->R0:#ff3b30,F1->R1:#ff3b30,F2->R2:#ff3b30,B1->F1:#ff3b30,R2->F2:#ff3b30,R1->L1:#ff3b30,R0->B0:#ff3b30,L1->B1:#ff3b30"
+    "arrows": "U7->U1:#ff3b30,U8->U2:#ff3b30,U5->U3:#ff3b30,U1->U5:#ff3b30,U3->U7:#ff3b30,U2->U8:#ff3b30"
   },
   {
     "id": "pll-gc",
@@ -1564,7 +1564,7 @@
     "validated": true,
     "method": "CFOP",
     "puzzle": "333",
-    "arrows": "U7->U1:#ff3b30,U8->U2:#ff3b30,U1->U3:#ff3b30,U3->U5:#ff3b30,U5->U7:#ff3b30,U2->U8:#ff3b30,B0->R0:#ff3b30,L1->R1:#ff3b30,F2->R2:#ff3b30,B1->F1:#ff3b30,R2->F2:#ff3b30,F1->L1:#ff3b30,R0->B0:#ff3b30,R1->B1:#ff3b30"
+    "arrows": "U7->U1:#ff3b30,U8->U2:#ff3b30,U1->U3:#ff3b30,U3->U5:#ff3b30,U5->U7:#ff3b30,U2->U8:#ff3b30"
   },
   {
     "id": "pll-gd",
@@ -1579,7 +1579,7 @@
     "validated": true,
     "method": "CFOP",
     "puzzle": "333",
-    "arrows": "U3->U1:#ff3b30,U8->U2:#ff3b30,U5->U3:#ff3b30,U7->U5:#ff3b30,U1->U7:#ff3b30,U2->U8:#ff3b30,B0->R0:#ff3b30,B1->R1:#ff3b30,F2->R2:#ff3b30,L1->F1:#ff3b30,R2->F2:#ff3b30,R1->L1:#ff3b30,R0->B0:#ff3b30,F1->B1:#ff3b30"
+    "arrows": "U3->U1:#ff3b30,U8->U2:#ff3b30,U5->U3:#ff3b30,U7->U5:#ff3b30,U1->U7:#ff3b30,U2->U8:#ff3b30"
   },
   {
     "id": "pll-f",
@@ -1594,7 +1594,7 @@
     "validated": true,
     "method": "CFOP",
     "puzzle": "333",
-    "arrows": "U7->U1:#ff3b30,U8->U2:#ff3b30,U1->U7:#ff3b30,U2->U8:#ff3b30,B0->R0:#ff3b30,F2->R2:#ff3b30,B1->F1:#ff3b30,R2->F2:#ff3b30,R0->B0:#ff3b30,F1->B1:#ff3b30"
+    "arrows": "U7->U1:#ff3b30,U8->U2:#ff3b30,U1->U7:#ff3b30,U2->U8:#ff3b30"
   },
   {
     "id": "pll-y",
@@ -1609,7 +1609,7 @@
     "validated": true,
     "method": "CFOP",
     "puzzle": "333",
-    "arrows": "U6->U2:#ff3b30,U7->U3:#ff3b30,U2->U6:#ff3b30,U3->U7:#ff3b30,L0->R0:#ff3b30,B2->F2:#ff3b30,R0->L0:#ff3b30,B1->L1:#ff3b30,L1->B1:#ff3b30,F2->B2:#ff3b30"
+    "arrows": "U6->U2:#ff3b30,U7->U3:#ff3b30,U2->U6:#ff3b30,U3->U7:#ff3b30"
   },
   {
     "id": "pll-na",
@@ -1624,7 +1624,7 @@
     "validated": true,
     "method": "CFOP",
     "puzzle": "333",
-    "arrows": "U8->U0:#ff3b30,U5->U3:#ff3b30,U3->U5:#ff3b30,U0->U8:#ff3b30,L1->R1:#ff3b30,L2->R2:#ff3b30,B0->F0:#ff3b30,R1->L1:#ff3b30,R2->L2:#ff3b30,F0->B0:#ff3b30"
+    "arrows": "U8->U0:#ff3b30,U5->U3:#ff3b30,U3->U5:#ff3b30,U0->U8:#ff3b30"
   },
   {
     "id": "pll-nb",
@@ -1639,7 +1639,7 @@
     "validated": true,
     "method": "CFOP",
     "puzzle": "333",
-    "arrows": "U6->U2:#ff3b30,U5->U3:#ff3b30,U3->U5:#ff3b30,U2->U6:#ff3b30,L0->R0:#ff3b30,L1->R1:#ff3b30,B2->F2:#ff3b30,R0->L0:#ff3b30,R1->L1:#ff3b30,F2->B2:#ff3b30"
+    "arrows": "U6->U2:#ff3b30,U5->U3:#ff3b30,U3->U5:#ff3b30,U2->U6:#ff3b30"
   },
   {
     "id": "pll-aa",
