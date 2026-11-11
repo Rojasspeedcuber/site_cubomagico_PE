@@ -48,15 +48,21 @@ test('React diagram loads self-hosted library once and reprocesses actual SVG af
     const before = await first.locator('svg').evaluate(el => el.outerHTML);
     assert.equal(await first.locator('[data-ci-alg]').getAttribute('data-ci-alg'), "R U' R U R U R U' R' U' R2 y2 x2");
     await page.evaluate(() => (window as any).updateDiagram("R U R' U R U2 R'", 'OLL', 220));
-    await page.waitForFunction(() => document.querySelector('[role="img"] [data-ci-alg]')?.getAttribute('data-ci-alg') === "R U R' U R U2 R' y2 x2");
+    await page.waitForFunction(() => document.querySelector('[role="img"] [data-ci-alg]')?.getAttribute('data-ci-alg') === "R U R' U R U2 R'");
+    assert.equal(await page.locator('[role="img"] .ci-oll').count(), 1, 'OLL uses the ci-oll mode');
     await page.waitForFunction((old: string) => document.querySelector('[role="img"] svg')?.outerHTML !== old, before);
     const actual = await first.locator('svg').evaluate(el => el.outerHTML);
+    // OLL is drawn by the same path the page uses (processAll on ci-oll): yellow top, neutral rest.
     const expected = await page.evaluate(() => {
-      const el = document.createElement('div');
-      el.innerHTML = (window as any).CubeIcons.render({ type: '3x3', angle: 'iso', alg: "R U R' U R U2 R' y2 x2", inverse: true, theme: 'light' });
-      return el.querySelector('svg')!.outerHTML;
+      const host = document.createElement('div'); document.body.appendChild(host);
+      const i = document.createElement('i');
+      i.className = 'ci ci-3x3 ci-iso ci-oll';
+      i.setAttribute('data-ci-alg', "R U R' U R U2 R'");
+      i.setAttribute('data-ci-theme', 'light');
+      host.appendChild(i); (window as any).CubeIcons.processAll(host);
+      const svg = i.querySelector('svg')!.outerHTML; host.remove(); return svg;
     });
-    assert.equal(actual, expected, 'SVG is the real library render of inverse algorithm after yellow/green base setup');
+    assert.equal(actual, expected, 'SVG is the real library render of the OLL case (ci-oll mode)');
     assert.equal(await first.evaluate(el => Math.round(el.getBoundingClientRect().width)), 220);
     assert.equal(await page.locator('.ci-scrambled').count(), 0);
     assert.equal(scriptRequests, 1);

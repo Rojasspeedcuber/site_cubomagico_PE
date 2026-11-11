@@ -6,6 +6,8 @@ export type CubeDiagramProps = {
   algorithm: string;
   category?: string;
   label: string;
+  /** Setas de troca "FROM->TO:cor,..." (PLL). Vazio = sem setas. */
+  arrows?: string;
   /** Largura e altura em pixels. */
   size?: number;
 };
@@ -51,9 +53,12 @@ function loadCubeIcons(): Promise<CubeIconsAPI> {
  * Default library base: U white, F green. x2 y2 makes U yellow AND F green.
  * ci-inverse reverses the whole sequence, so the data algorithm must end in
  * "y2 x2": inverse(solution y2 x2) = x2 y2 inverse(solution).
- * Do not use ci-oll here: it installs a different, already-rotated base.
+ * OLL uses ci-oll instead: it shows the case itself on the already-yellow top,
+ * so it takes the algorithm as written (no inverse, no y2 x2).
+ * PLL uses the same setup as F2L; swap arrows (data-ci-arrows) are drawn only when
+ * the case has them (pure permutations; see the algorithms catalogue).
  */
-export default function CubeDiagram({ algorithm, category, label, size = 180 }: CubeDiagramProps) {
+export default function CubeDiagram({ algorithm, category, label, arrows = '', size = 180 }: CubeDiagramProps) {
   const hostRef = useRef<HTMLSpanElement>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const pixels = Number.isFinite(size) ? Math.min(600, Math.max(64, size)) : 180;
@@ -65,8 +70,14 @@ export default function CubeDiagram({ algorithm, category, label, size = 180 }: 
     setStatus('loading');
     // React owns the host only; CubeIcons owns the imperative child/SVG.
     const icon = document.createElement('i');
-    icon.className = 'ci ci-3x3 ci-iso ci-inverse';
-    icon.setAttribute('data-ci-alg', `${algorithm.trim()} y2 x2`);
+    if (category === 'OLL') {
+      icon.className = 'ci ci-3x3 ci-iso ci-oll';
+      icon.setAttribute('data-ci-alg', algorithm.trim());
+    } else {
+      icon.className = 'ci ci-3x3 ci-iso ci-inverse';
+      icon.setAttribute('data-ci-alg', `${algorithm.trim()} y2 x2`);
+    }
+    if (category === 'PLL' && arrows) icon.setAttribute('data-ci-arrows', arrows);
     icon.setAttribute('data-ci-theme', 'light');
     icon.setAttribute('aria-hidden', 'true');
     icon.style.width = '100%';
@@ -81,7 +92,7 @@ export default function CubeDiagram({ algorithm, category, label, size = 180 }: 
       setStatus(icon.querySelector('svg') ? 'ready' : 'error');
     }).catch(() => { if (active) setStatus('error'); });
     return () => { active = false; host.replaceChildren(); };
-  }, [algorithm, category]);
+  }, [algorithm, category, arrows]);
 
   return (
     <span

@@ -19,6 +19,7 @@ export type Algorithm = {
   validated: boolean;
   method: string;
   puzzle: string;
+  arrows: string;
 };
 export type Content = Record<string, string>;
 export type Attempt = {

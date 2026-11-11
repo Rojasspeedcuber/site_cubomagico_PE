@@ -17,11 +17,11 @@ export async function updateContent(actor:User,payload:unknown) {
  });
  return getContent();
 }
-export async function listAlgorithms(includeUnvalidated=false) {return (await query(`SELECT id,name,category,algorithm,variations,orientation,notes,source_url,source_name,validated,method,puzzle FROM algorithms WHERE NOT archived${includeUnvalidated ? '' : ' AND validated'} ORDER BY category,name,id`)).map(camel);}
+export async function listAlgorithms(includeUnvalidated=false) {return (await query(`SELECT id,name,category,algorithm,variations,orientation,notes,source_url,source_name,validated,method,puzzle,arrows FROM algorithms WHERE NOT archived${includeUnvalidated ? '' : ' AND validated'} ORDER BY category,name,id`)).map(camel);}
 export async function createAlgorithm(actor:User,payload:unknown) {
  const data=parse(algorithmSchema,payload); const id=data.id || randomUUID();
  return transaction(async db=>{
-  const [row]=await query('INSERT INTO algorithms(id,name,category,algorithm,variations,orientation,notes,source_url,source_name,validated,method,puzzle) VALUES($1,$2,$3,$4,$5::jsonb,$6,$7,$8,$9,$10,$11,$12) RETURNING *',[id,data.name,data.category,data.algorithm,JSON.stringify(data.variations),data.orientation,data.notes,data.sourceUrl,data.sourceName,data.validated,data.method,data.puzzle],db);
+  const [row]=await query('INSERT INTO algorithms(id,name,category,algorithm,variations,orientation,notes,source_url,source_name,validated,method,puzzle,arrows) VALUES($1,$2,$3,$4,$5::jsonb,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *',[id,data.name,data.category,data.algorithm,JSON.stringify(data.variations),data.orientation,data.notes,data.sourceUrl,data.sourceName,data.validated,data.method,data.puzzle,data.arrows],db);
   await audit(db,actor.id,'ALGORITHM_CREATED',id); const {archived,...result}=camel(row); return result;
  });
 }
@@ -32,7 +32,7 @@ export async function updateAlgorithm(id:string,actor:User,payload:unknown) {
   if(!row) throw new HttpError(404,'Algoritmo não encontrado.');
   const patch=parsePatch(algorithmSchema.partial().omit({id:true}),payload);
   const data=parse(algorithmSchema,{...camel(row),...patch,id});
-  const [result]=await query('UPDATE algorithms SET name=$1,category=$2,algorithm=$3,variations=$4::jsonb,orientation=$5,notes=$6,source_url=$7,source_name=$8,validated=$9 WHERE id=$10 RETURNING id,name,category,algorithm,variations,orientation,notes,source_url,source_name,validated,method,puzzle',[data.name,data.category,data.algorithm,JSON.stringify(data.variations),data.orientation,data.notes,data.sourceUrl,data.sourceName,data.validated,id],db);
+  const [result]=await query('UPDATE algorithms SET name=$1,category=$2,algorithm=$3,variations=$4::jsonb,orientation=$5,notes=$6,source_url=$7,source_name=$8,validated=$9,arrows=$10 WHERE id=$11 RETURNING id,name,category,algorithm,variations,orientation,notes,source_url,source_name,validated,method,puzzle,arrows',[data.name,data.category,data.algorithm,JSON.stringify(data.variations),data.orientation,data.notes,data.sourceUrl,data.sourceName,data.validated,data.arrows,id],db);
   await audit(db,actor.id,'ALGORITHM_UPDATED',id); return camel(result);
  });
 }

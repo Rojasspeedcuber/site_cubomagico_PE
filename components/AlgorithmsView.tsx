@@ -306,6 +306,7 @@ export default function AlgorithmsView() {
                         algorithm={a.algorithm}
                         category={a.category}
                         label={`Caso ${a.name}`}
+                        arrows={a.arrows}
                         size={128}
                       />
                     </button>
@@ -383,6 +384,7 @@ export default function AlgorithmsView() {
               algorithm={selected.algorithm}
               category={selected.category}
               label={selected.name}
+              arrows={selected.arrows}
               size={190}
             />
             <span
