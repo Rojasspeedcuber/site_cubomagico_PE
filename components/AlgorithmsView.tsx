@@ -16,7 +16,7 @@ import {
   Star,
 } from "lucide-react";
 import { useApi } from "./api";
-import { filterAlgorithms, safeUrl } from "./frontend-utils";
+import { filterAlgorithms } from "./frontend-utils";
 import {
   CopyButton,
   CubeArt,
@@ -403,12 +403,6 @@ export default function AlgorithmsView() {
             {selected.orientation ||
               "Observe o diagrama antes de executar os movimentos. A face superior é amarela."}
           </p>
-          {selected.notes && (
-            <>
-              <h3>Observações</h3>
-              <p className="prose">{selected.notes}</p>
-            </>
-          )}
           {selected.variations?.length > 0 && (
             <>
               <h3>Variações</h3>
@@ -420,23 +414,6 @@ export default function AlgorithmsView() {
               ))}
             </>
           )}
-          <div className="detail-source">
-            {safeUrl(selected.sourceUrl) ? (
-              <a
-                href={safeUrl(selected.sourceUrl)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {selected.sourceName || "Consultar fonte"}{" "}
-                <ArrowUpRight size={14} />
-              </a>
-            ) : (
-              <span>Fonte não informada.</span>
-            )}
-            <span>
-              {selected.validated ? "Revisado no acervo" : "Revisão pendente"}
-            </span>
-          </div>
           <div className="button-row">
             <button
               className="button secondary"

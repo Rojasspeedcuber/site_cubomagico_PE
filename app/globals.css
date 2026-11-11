@@ -1339,18 +1339,6 @@ main:focus {
   flex-shrink: 0;
   max-width: 110px;
 }
-.detail-source {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  font-size: 10px;
-  margin: 24px 0;
-  color: var(--muted);
-  flex-wrap: wrap;
-}
-.detail-source a {
-  color: var(--blue);
-}
 .prose {
   white-space: pre-line;
   overflow-wrap: anywhere;
