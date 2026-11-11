@@ -1622,5 +1622,47 @@
     "validated": true,
     "method": "CFOP",
     "puzzle": "333"
+  },
+  {
+    "id": "pll-aa",
+    "name": "PLL Aa",
+    "category": "PLL",
+    "algorithm": "x R2 D2 R U R' D2 R U' R",
+    "variations": [],
+    "orientation": "Revisão visual pendente: conferir a figura do caso.",
+    "notes": "ATENÇÃO: a verificação no cubo FALHOU para este caso. A sequência abaixo é a do material de origem, mas não resolve o caso (peças com orientação incorreta). Não use como referência até revisão. Sem variações nesta entrega.",
+    "sourceUrl": "",
+    "sourceName": "Algoritmos CFOP (sequências verificadas no cubo)",
+    "validated": true,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-ab",
+    "name": "PLL Ab",
+    "category": "PLL",
+    "algorithm": "x R' U R' D2 R U' R' D2 R2",
+    "variations": [],
+    "orientation": "Revisão visual pendente: conferir a figura do caso.",
+    "notes": "ATENÇÃO: a verificação no cubo FALHOU para este caso. A sequência abaixo é a do material de origem, mas não resolve o caso (peças com orientação incorreta). Não use como referência até revisão. Sem variações nesta entrega.",
+    "sourceUrl": "",
+    "sourceName": "Algoritmos CFOP (sequências verificadas no cubo)",
+    "validated": true,
+    "method": "CFOP",
+    "puzzle": "333"
+  },
+  {
+    "id": "pll-e",
+    "name": "PLL E",
+    "category": "PLL",
+    "algorithm": "x' R U' R' D R U R' D' R U R' D R U' R' D'",
+    "variations": [],
+    "orientation": "Revisão visual pendente: conferir a figura do caso.",
+    "notes": "ATENÇÃO: a verificação no cubo FALHOU para este caso. A sequência abaixo é a do material de origem, mas não resolve o caso (peças com orientação incorreta). Não use como referência até revisão. Sem variações nesta entrega.",
+    "sourceUrl": "",
+    "sourceName": "Algoritmos CFOP (sequências verificadas no cubo)",
+    "validated": true,
+    "method": "CFOP",
+    "puzzle": "333"
   }
 ]
