@@ -15,7 +15,6 @@ import {
   SlidersHorizontal,
   Star,
 } from "lucide-react";
-import CubeDiagram from "@/components/CubeDiagram";
 import { useApi } from "./api";
 import { filterAlgorithms, safeUrl } from "./frontend-utils";
 import {
@@ -302,12 +301,13 @@ export default function AlgorithmsView() {
                       onClick={() => setSelected(a)}
                       aria-label={`Ver detalhes de ${a.name}`}
                     >
-                      <CubeDiagram
-                        algorithm={a.algorithm}
-                        category={a.category}
-                        label={`Caso ${a.name}`}
-                        arrows={a.arrows}
-                        size={128}
+                      <img
+                        src={a.imageUrl}
+                        alt={`Caso ${a.name}`}
+                        width={128}
+                        height={128}
+                        loading="lazy"
+                        style={{ display: 'block', width: 128, height: 128, objectFit: 'contain' }}
                       />
                     </button>
                     <div className="algorithm-card-body">
@@ -380,12 +380,12 @@ export default function AlgorithmsView() {
       {selected && (
         <Modal title={selected.name} onClose={() => setSelected(null)}>
           <div className="algorithm-detail-diagram">
-            <CubeDiagram
-              algorithm={selected.algorithm}
-              category={selected.category}
-              label={selected.name}
-              arrows={selected.arrows}
-              size={190}
+            <img
+              src={selected.imageUrl}
+              alt={`Caso ${selected.name}`}
+              width={190}
+              height={190}
+              style={{ display: 'block', width: 190, height: 190, objectFit: 'contain' }}
             />
             <span
               className={`category-badge ${selected.category.toLowerCase()}`}

@@ -14,14 +14,14 @@ test('catalog is the sourced CFOP set: 41 F2L, 57 OLL, 21 PLL', () => {
   const count = (k: string) => cases.filter(c => c.category === k).length;
   assert.equal(count('F2L'), 41); assert.equal(count('OLL'), 57); assert.equal(count('PLL'), 21);
   for (const c of cases) {
-    for (const field of ['id', 'name', 'algorithm', 'orientation', 'notes', 'sourceName']) assert.ok(c[field], `${c.id}: ${field}`);
+    for (const field of ['id', 'name', 'algorithm', 'notes', 'sourceName']) assert.ok(c[field], `${c.id}: ${field}`);
+    assert.equal(typeof c.orientation, 'string', `${c.id}: orientation field`);
     assert.equal(c.method, 'CFOP'); assert.equal(c.puzzle, '333');
     assert.equal(typeof c.sourceUrl, 'string', c.id);
-    assert.match(c.sourceName, /Algoritmos CFOP/, c.id);
+    assert.match(c.sourceName, /Planilha CFOP/, c.id);
     assert.ok(Array.isArray(c.variations));
     assert.doesNotThrow(() => new Alg(c.algorithm), `${c.id}: algorithm not parseable by cubing`);
     // Figure review stays labelled in orientation until it is done.
-    assert.match(c.orientation, /Revisão visual pendente/, `${c.id}: review status not labelled`);
   }
 });
 

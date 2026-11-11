@@ -11,7 +11,7 @@ try {
  await transaction(async db=>{
   for(const item of algorithms) {
    const id=item.id || `${item.category.toLowerCase()}-${createHash('sha256').update(item.name+item.algorithm).digest('hex').slice(0,16)}`;
-   const rows=await query('INSERT INTO algorithms(id,name,category,algorithm,variations,orientation,notes,source_url,source_name,validated,method,puzzle) VALUES($1,$2,$3,$4,$5::jsonb,$6,$7,$8,$9,$10,$11,$12) ON CONFLICT(id) DO NOTHING RETURNING id',[id,item.name,item.category,item.algorithm,JSON.stringify(item.variations),item.orientation,item.notes,item.sourceUrl,item.sourceName,item.validated,item.method,item.puzzle],db);
+   const rows=await query('INSERT INTO algorithms(id,name,category,algorithm,variations,orientation,notes,source_url,source_name,validated,method,puzzle,arrows,image_url) VALUES($1,$2,$3,$4,$5::jsonb,$6,$7,$8,$9,$10,$11,$12,$13,$14) ON CONFLICT(id) DO UPDATE SET name=EXCLUDED.name,category=EXCLUDED.category,algorithm=EXCLUDED.algorithm,variations=EXCLUDED.variations,orientation=EXCLUDED.orientation,notes=EXCLUDED.notes,source_url=EXCLUDED.source_url,source_name=EXCLUDED.source_name,validated=EXCLUDED.validated,arrows=EXCLUDED.arrows,image_url=EXCLUDED.image_url RETURNING id',[id,item.name,item.category,item.algorithm,JSON.stringify(item.variations),item.orientation,item.notes,item.sourceUrl,item.sourceName,item.validated,item.method,item.puzzle,item.arrows,item.imageUrl],db);
    insertedAlgorithms+=rows.length;
   }
   for(const [key,value] of Object.entries(content)) {

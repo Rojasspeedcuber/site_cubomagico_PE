@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test';
 
-test('acervo: busca, diagramas cube-icons e progresso local persistente', async ({ page }) => {
+test('acervo: busca, figuras da planilha e progresso local persistente', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/algoritmos');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  await expect(page.locator('.ci svg').first()).toBeVisible({ timeout: 20000 });
+  await expect(page.locator('img[src^="/algoritmos/"]').first()).toBeVisible({ timeout: 20000 });
   await expect(page.getByRole('searchbox')).toBeVisible();
   await page.getByRole('searchbox').fill('OLL caso 1');
   await expect(page.getByText('OLL caso 1', { exact: true }).first()).toBeVisible();

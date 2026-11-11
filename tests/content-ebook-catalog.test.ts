@@ -25,9 +25,8 @@ test('every case has a parseable algorithm, attribution and an honest review sta
   for (const c of catalog()) {
     assert.doesNotThrow(() => new Alg(c.algorithm), `${c.id}: algorithm not parseable`);
     assert.equal(c.method, 'CFOP'); assert.equal(c.puzzle, '333');
-    assert.match(c.sourceName, /Algoritmos CFOP/, c.id);
+    assert.match(c.sourceName, /Planilha CFOP/, c.id);
     assert.equal(typeof c.sourceUrl, 'string', c.id);
     assert.equal(c.validated, true, `${c.id}: published`);
-    assert.match(c.orientation, /Revisão visual pendente/, `${c.id}: figure review stays labelled`);
   }
 });

@@ -20,6 +20,7 @@ export type Algorithm = {
   method: string;
   puzzle: string;
   arrows: string;
+  imageUrl: string;
 };
 export type Content = Record<string, string>;
 export type Attempt = {
