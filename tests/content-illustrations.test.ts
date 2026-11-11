@@ -50,3 +50,9 @@ test('PLL with arrows is drawn in the top view (ci-top), as in the e-book', () =
   assert.match(src, /category === 'PLL' && arrows\)/, 'PLL with arrows branch');
   assert.match(src, /'ci ci-3x3 ci-top ci-inverse'/, 'top view class');
 });
+
+test('every PLL is drawn in the top view, with or without arrows (as in the e-book)', () => {
+  const src = readFileSync(new URL('../components/CubeDiagram.tsx', import.meta.url), 'utf8');
+  assert.match(src, /category === 'PLL'\)\s*\{?/, 'PLL branch');
+  assert.doesNotMatch(src, /category === 'PLL' && arrows\)\s*\{\s*\/\/ Top view/, 'top view must not depend on arrows');
+});
