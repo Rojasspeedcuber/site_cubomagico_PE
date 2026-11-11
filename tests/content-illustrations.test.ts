@@ -44,3 +44,9 @@ test('PLL arrows are only derived for pure permutations', async () => {
   assert.equal(pure.length + impure.length, 21);
   assert.ok(pure.length >= 17, `expected at least 17 pure PLL, got ${pure.length}`);
 });
+
+test('PLL with arrows is drawn in the top view (ci-top), as in the e-book', () => {
+  const src = readFileSync(new URL('../components/CubeDiagram.tsx', import.meta.url), 'utf8');
+  assert.match(src, /category === 'PLL' && arrows\)/, 'PLL with arrows branch');
+  assert.match(src, /'ci ci-3x3 ci-top ci-inverse'/, 'top view class');
+});

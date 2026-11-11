@@ -73,6 +73,10 @@ export default function CubeDiagram({ algorithm, category, label, arrows = '', s
     if (category === 'OLL') {
       icon.className = 'ci ci-3x3 ci-iso ci-oll';
       icon.setAttribute('data-ci-alg', algorithm.trim());
+    } else if (category === 'PLL' && arrows) {
+      // Top view, as in the e-book: flat U face with the swap arrows on it.
+      icon.className = 'ci ci-3x3 ci-top ci-inverse';
+      icon.setAttribute('data-ci-alg', `${algorithm.trim()} y2 x2`);
     } else {
       icon.className = 'ci ci-3x3 ci-iso ci-inverse';
       icon.setAttribute('data-ci-alg', `${algorithm.trim()} y2 x2`);
