@@ -350,11 +350,7 @@ export default function AlgorithmsView() {
             )}
             <div className="collection-note">
               <Info size={16} />
-              <p>
-                Este é um acervo inicial e ainda incompleto. Cada caso tem sua
-                orientação e sua fonte nos detalhes. Priorize a compreensão, não
-                apenas a memorização.
-              </p>
+              <p>Priorize a compreensão, não apenas a memorização.</p>
             </div>
           </div>
         </div>
