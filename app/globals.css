@@ -1912,6 +1912,47 @@ main:focus {
   aspect-ratio: 4/3;
   object-fit: cover;
   border-radius: 8px;
+  display: block;
+}
+.community-photo-figure {
+  margin: 0;
+  min-width: 0;
+}
+.community-photo-caption {
+  margin-top: 8px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.community-photo-caption a,
+.community-feature a {
+  color: var(--blue);
+}
+.community-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 30px;
+  align-items: center;
+  margin-top: 24px;
+  padding: 24px;
+}
+.community-feature > img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.community-feature h2 {
+  font-size: 25px;
+  margin: 10px 0 14px;
+}
+.community-feature a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 16px;
+  font-size: 13px;
+  font-weight: 700;
 }
 .community-photo-placeholder {
   border: 1px dashed var(--border);
@@ -3042,6 +3083,14 @@ main:focus {
   }
   .community-photo-placeholder {
     min-height: 210px;
+  }
+  .community-feature {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+  .community-feature h2 {
+    font-size: 23px;
   }
   .about-grid {
     grid-template-columns: 1fr;

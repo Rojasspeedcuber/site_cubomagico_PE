@@ -76,11 +76,20 @@ export default function AboutView() {
                   )}
               </div>
               {safeUrl(data.communityPhotoUrl) ? (
-                <img
-                  className="community-photo"
-                  src={safeUrl(data.communityPhotoUrl)}
-                  alt={data.communityPhotoAlt || "Comunidade de cubo mágico"}
-                />
+                <figure className="community-photo-figure">
+                  <img
+                    className="community-photo"
+                    src={safeUrl(data.communityPhotoUrl)}
+                    alt={data.communityPhotoAlt || "Comunidade de cubo mágico"}
+                  />
+                  {data.communityPhotoUrl === "https://cubomagicope.rojasdev.cloud/imgs/recife-iv-comunidade.webp" && (
+                    <figcaption className="community-photo-caption">
+                      <a href="https://www.instagram.com/p/C58nxG7LuZW/" target="_blank" rel="noopener noreferrer">
+                        IV Recife Open · @cubomagico_pe
+                      </a>{" "}· cobertura: @joao.mutz
+                    </figcaption>
+                  )}
+                </figure>
               ) : (
                 <div className="community-photo-placeholder">
                   <Users size={56} />
@@ -119,6 +128,24 @@ export default function AboutView() {
                 </section>
               ))}
             </div>
+            <section className="community-feature panel" aria-labelledby="community-feature-title">
+              <img
+                src="/imgs/recife-iv-organizacao.webp"
+                alt="José Augusto, Lucca Renè e Samuel Simões, equipe de organização dos Recife Open"
+                loading="lazy"
+              />
+              <div>
+                <p className="eyebrow">Por trás das competições</p>
+                <h2 id="community-feature-title">Quem ajuda a organizar</h2>
+                <p className="prose">
+                  José Augusto, Lucca Renè e Samuel Simões integraram a equipe
+                  de organização dos III e IV Recife Open.
+                </p>
+                <a href="https://www.instagram.com/p/C58s84Hrw15/" target="_blank" rel="noopener noreferrer">
+                  Ver foto no Instagram <ArrowUpRight size={15} />
+                </a>
+              </div>
+            </section>
             <section className="developer-section" id="desenvolvedor">
               <div className="developer-portrait">
                 {safeUrl(data.developerPhotoUrl) ? (

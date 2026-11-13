@@ -14,7 +14,13 @@ test('community content reflects the connected profile without inventing recurri
   assert.equal(content.contactEmail, 'henriquer01@rojasdev.cloud');
   assert.equal(content.developerContact, 'henriquer01@rojasdev.cloud');
   assert.deepEqual(readFileSync(new URL('../public/imgs/logo-cubo-pe.jpeg', import.meta.url)), readFileSync(new URL('../imgs/Logo - cobomagico_pe.jpeg', import.meta.url)));
-  for (const key of ['whatsappUrl', 'communityPhotoUrl', 'developerPhotoUrl', 'portfolioUrl']) assert.equal(content[key], '', `do not invent ${key}`);
+  for (const key of ['whatsappUrl', 'developerPhotoUrl', 'portfolioUrl']) assert.equal(content[key], '', `do not invent ${key}`);
+  assert.equal(content.communityPhotoUrl, 'https://cubomagicope.rojasdev.cloud/imgs/recife-iv-comunidade.webp');
+  for (const file of ['recife-iv-comunidade.webp', 'recife-iv-organizacao.webp']) {
+    const image = readFileSync(new URL(`../public/imgs/${file}`, import.meta.url));
+    assert.equal(image.toString('ascii', 0, 4), 'RIFF');
+    assert.equal(image.toString('ascii', 8, 12), 'WEBP');
+  }
   assert.equal(content.instagramUrl, 'https://www.instagram.com/cubomagico_pe/');
   assert.match(content.history, /IV Recife Open/);
   assert.match(content.history, /VII Recife Open/);
