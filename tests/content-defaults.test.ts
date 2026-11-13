@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 
-test('institutional defaults are editable strings with no invented contacts, history, or meeting dates', () => {
+test('community content reflects the connected profile without inventing recurring events or contacts', () => {
   const url = new URL('../data/content.json', import.meta.url);
   assert.ok(existsSync(url), 'missing editable content defaults');
   const content = JSON.parse(readFileSync(url, 'utf8'));
@@ -14,10 +14,12 @@ test('institutional defaults are editable strings with no invented contacts, his
   assert.equal(content.contactEmail, 'henriquer01@rojasdev.cloud');
   assert.equal(content.developerContact, 'henriquer01@rojasdev.cloud');
   assert.deepEqual(readFileSync(new URL('../public/imgs/logo-cubo-pe.jpeg', import.meta.url)), readFileSync(new URL('../imgs/Logo - cobomagico_pe.jpeg', import.meta.url)));
-  for (const key of ['whatsappUrl', 'instagramUrl', 'communityPhotoUrl', 'developerPhotoUrl', 'portfolioUrl']) assert.equal(content[key], '', `do not invent ${key}`);
-  assert.match(content.history, /informad|confirmad|preenchid/);
-  assert.match(content.meetings, /informad|confirmad|preenchid/);
-  assert.doesNotMatch(content.history + content.meetings, /\b\d{4}\b|https?:|@/);
+  for (const key of ['whatsappUrl', 'communityPhotoUrl', 'developerPhotoUrl', 'portfolioUrl']) assert.equal(content[key], '', `do not invent ${key}`);
+  assert.equal(content.instagramUrl, 'https://www.instagram.com/cubomagico_pe/');
+  assert.match(content.history, /IV Recife Open/);
+  assert.match(content.history, /VII Recife Open/);
+  assert.match(content.meetings, /Não há um calendário fixo de encontros informado/);
+  assert.doesNotMatch(content.welcome, /acervo é pequeno|não contém todos os casos/);
   assert.match(content.developerBio, /Henrique Rojas Moreno de Almeida/);
   assert.match(content.developerBio, /estudante de Ciência da Computação/);
   assert.match(content.developerBio, /Desde 2023, atuo como delegado voluntário da World Cube Association \(WCA\)/);
