@@ -1936,17 +1936,35 @@ main:focus {
   margin-top: 24px;
   padding: 24px;
 }
-.community-feature > img {
+.community-feature-photo {
+  margin: 0;
+  min-width: 0;
+}
+.community-feature-photo img {
   width: 100%;
   aspect-ratio: 4/3;
   object-fit: cover;
   border-radius: 8px;
+  display: block;
+}
+.community-feature-photo figcaption {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+  margin-top: 8px;
 }
 .community-feature h2 {
   font-size: 25px;
   margin: 10px 0 14px;
 }
-.community-feature a {
+.organization-roles {
+  display: grid;
+  gap: 12px;
+}
+.organization-roles strong {
+  color: var(--text);
+}
+.community-feature > div > a {
   display: inline-flex;
   align-items: center;
   gap: 5px;

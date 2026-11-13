@@ -129,20 +129,33 @@ export default function AboutView() {
               ))}
             </div>
             <section className="community-feature panel" aria-labelledby="community-feature-title">
-              <img
-                src="/imgs/recife-iv-organizacao.webp"
-                alt="José Augusto, Lucca Renè e Samuel Simões, equipe de organização dos Recife Open"
-                loading="lazy"
-              />
+              <figure className="community-feature-photo">
+                <img
+                  src="/imgs/recife-iv-organizacao.webp"
+                  alt="José Augusto, Lucca Renè e Samuel Simões na organização dos Recife Open em 2024"
+                  loading="lazy"
+                />
+                <figcaption>
+                  <a href="https://www.instagram.com/p/C58s84Hrw15/" target="_blank" rel="noopener noreferrer">
+                    Registro de 2024 · III e IV Recife Open
+                  </a>
+                </figcaption>
+              </figure>
               <div>
-                <p className="eyebrow">Por trás das competições</p>
-                <h2 id="community-feature-title">Quem ajuda a organizar</h2>
-                <p className="prose">
-                  José Augusto, Lucca Renè e Samuel Simões integraram a equipe
-                  de organização dos III e IV Recife Open.
-                </p>
-                <a href="https://www.instagram.com/p/C58s84Hrw15/" target="_blank" rel="noopener noreferrer">
-                  Ver foto no Instagram <ArrowUpRight size={15} />
+                <p className="eyebrow">Campeonatos recentes</p>
+                <h2 id="community-feature-title">Organização</h2>
+                <div className="organization-roles">
+                  <p className="prose">
+                    <strong>Organizadores</strong><br />
+                    Laura Thauane Domingos Nascimento, Samuel Simões de Souza Filho e Lucca Renè.
+                  </p>
+                  <p className="prose">
+                    <strong>Delegados da WCA</strong><br />
+                    Henrique Rojas Moreno de Almeida e José Augusto Almeida da Silva.
+                  </p>
+                </div>
+                <a href="https://www.worldcubeassociation.org/competitions/VIIRecifeOpen2026" target="_blank" rel="noopener noreferrer">
+                  VII Recife Open 2026 na WCA <ArrowUpRight size={15} />
                 </a>
               </div>
             </section>
