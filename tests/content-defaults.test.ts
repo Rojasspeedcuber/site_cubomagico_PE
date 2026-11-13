@@ -9,6 +9,7 @@ test('institutional defaults are editable strings with no invented contacts, his
   const keys = ['communityName', 'communityShortName', 'logoUrl', 'history', 'objectives', 'meetings', 'welcome', 'whatsappUrl', 'instagramUrl', 'contactEmail', 'communityPhotoUrl', 'communityPhotoAlt', 'developerBio', 'developerPhotoUrl', 'portfolioUrl', 'githubUrl', 'linkedinUrl', 'developerContact'];
   assert.deepEqual(Object.keys(content).sort(), keys.sort());
   for (const key of keys) assert.equal(typeof content[key], 'string', key);
+  assert.equal(content.communityShortName, 'CUBO MÁGICO PE');
   assert.equal(content.logoUrl, 'https://cubomagicope.rojasdev.site/imgs/logo-cubo-pe.jpeg');
   assert.equal(content.contactEmail, 'henriquer01@rojasdev.cloud');
   assert.equal(content.developerContact, 'henriquer01@rojasdev.cloud');

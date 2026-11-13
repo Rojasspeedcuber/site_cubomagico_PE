@@ -276,14 +276,6 @@ main:focus {
   letter-spacing: 0.035em;
   line-height: 1.25;
 }
-.brand small {
-  display: block;
-  font-size: 10px;
-  color: var(--muted);
-  font-weight: 400;
-  letter-spacing: 0.02em;
-  margin-top: 5px;
-}
 .brand-mark {
   width: 35px;
   height: 35px;
@@ -2293,9 +2285,6 @@ main:focus {
   .brand > span:last-child {
     font-size: 17px;
   }
-  .brand small {
-    font-size: 9px;
-  }
   .library-layout {
     grid-template-columns: 185px minmax(0, 1fr);
     gap: 25px;
@@ -2382,9 +2371,6 @@ main:focus {
   }
   .brand > span:last-child {
     font-size: 18px;
-  }
-  .brand small {
-    font-size: 9px;
   }
   .hero-inner {
     grid-template-columns: 1.25fr 1fr;
@@ -2595,9 +2581,6 @@ main:focus {
   }
   .brand > span:last-child {
     font-size: 17px;
-  }
-  .brand small {
-    font-size: 8px;
   }
   .account-link > span {
     display: none;
@@ -3350,8 +3333,8 @@ main:focus {
   .header-inner {
     gap: 7px;
   }
-  .brand small {
-    font-size: 7px;
+  .brand > span:last-child {
+    font-size: 14px;
   }
   .header-actions {
     gap: 1px;

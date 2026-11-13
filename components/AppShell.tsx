@@ -104,8 +104,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
               </span>
             )}
             <span>
-              {content.data?.communityShortName || "CUBO PE"}
-              <small>Cubo mágico em Pernambuco</small>
+              {content.data?.communityShortName || "CUBO MÁGICO PE"}
             </span>
           </Link>
           <nav className="desktop-nav" aria-label="Navegação principal">
